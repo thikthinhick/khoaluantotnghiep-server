@@ -18,8 +18,9 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true)
     private String username;
-    private String email;
+    private String fullName;
     private String password;
     private String thumbnail;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
@@ -27,8 +28,4 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
-    public void addRole(Role role) {
-        if(roles == null) roles = new HashSet<>();
-        roles.add(role);
-    }
 }

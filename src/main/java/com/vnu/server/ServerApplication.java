@@ -25,18 +25,8 @@ public class ServerApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Role role = Role.builder()
-                        .name("ADMIN")
+                        .name("USER")
                                 .build();
         roleRepository.save(role);
-        User user = User.builder()
-                .username("chuong")
-                .email("chuong2001@gmail.com")
-                .password("chuong2001")
-                .thumbnail("http://google.com.vn")
-                .build();
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
-        userRepository.save(user);
     }
 }
