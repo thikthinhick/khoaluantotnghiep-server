@@ -3,6 +3,7 @@ package com.vnu.server.jwt;
 import com.vnu.server.model.MyUserDetails;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -14,7 +15,8 @@ public class JwtTokenProvider {
 
     private final long JWT_EXPIRATION = 604800000L;
 
-    public String generateToken(MyUserDetails user) {
+    public String generateToken(Authentication authentication) {
+        MyUserDetails user = (MyUserDetails) authentication.getPrincipal();
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + JWT_EXPIRATION);
         return Jwts.builder()
