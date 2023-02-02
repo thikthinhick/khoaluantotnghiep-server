@@ -29,4 +29,5 @@ public class ApplianceController {
         private String message;
         private List<Appliance> appliances;
     }
+
 }

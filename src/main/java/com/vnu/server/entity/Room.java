@@ -16,7 +16,7 @@ public class Room {
     private String name;
     private String description;
     private String thumbnail;
-    @OneToMany(mappedBy = "restaurant")
+    @OneToMany(mappedBy = "room")
     @JsonManagedReference
     private Set<Appliance> appliances = new HashSet<>();
 }
