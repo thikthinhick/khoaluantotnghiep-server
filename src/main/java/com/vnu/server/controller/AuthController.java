@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class  AuthController {
     private final UserRepository userRepository;
     private final JwtTokenProvider tokenProvider;
     private final RoleRepository roleRepository;

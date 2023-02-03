@@ -1,5 +1,6 @@
 package com.vnu.server;
 
+import com.vnu.server.entity.Role;
 import com.vnu.server.repository.RoleRepository;
 import com.vnu.server.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +9,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+import static com.vnu.server.entity.Role.RoleName.READ;
+import static com.vnu.server.entity.Role.RoleName.USER;
+
 @SpringBootApplication
-//@EnableScheduling
 public class ServerApplication implements CommandLineRunner {
     @Autowired
     private UserRepository userRepository;
@@ -21,6 +24,11 @@ public class ServerApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-
+        Role role = new Role();
+        role.setName(USER.name());
+        Role role1 = new Role();
+        role1.setName(READ.name());
+        roleRepository.save(role);
+        roleRepository.save(role1);
     }
 }
