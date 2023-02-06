@@ -6,10 +6,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 public interface ApplianceService {
-    void save(Appliance appliance, HttpServletRequest request);
+    void save(Appliance appliance, Long userId, Long roomId);
     void update(Appliance appliance);
     List<Appliance> getAll();
     Appliance getById(Long applianceId);
     void removeApplianceToRoom(Long roomId, Long applianceId);
-    void addApplianceToRoom(Long roomId, Long applianceId);
 }

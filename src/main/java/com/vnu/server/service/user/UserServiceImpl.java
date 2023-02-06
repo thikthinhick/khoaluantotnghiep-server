@@ -5,12 +5,15 @@ import com.vnu.server.entity.Role;
 import com.vnu.server.entity.Room;
 import com.vnu.server.entity.User;
 import com.vnu.server.exception.ResourceNotFoundException;
+import com.vnu.server.jwt.JwtTokenProvider;
 import com.vnu.server.model.MyUserDetails;
 import com.vnu.server.repository.MemberRepository;
 import com.vnu.server.repository.RoleRepository;
 import com.vnu.server.repository.RoomRepository;
 import com.vnu.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,12 +24,14 @@ import static com.vnu.server.entity.Role.RoleName.READ;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserDetailsService, UserService {
 
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
     private final RoleRepository roleRepository;
+    private final JwtTokenProvider tokenProvider;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
