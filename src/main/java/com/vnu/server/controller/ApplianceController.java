@@ -31,13 +31,6 @@ public class ApplianceController {
         applianceService.save(applianceRequest.getAppliance(), Long.parseLong(userId), applianceRequest.getRoomId());
         return ResponseEntity.ok().body(new MessageResponse("Tạo thiết bị thành công!"));
     }
-
-    //    @Data
-//    @AllArgsConstructor
-//    private static class MessageAppliance{
-//        private String message;
-//        private List<Appliance> appliances;
-//    }
     @Data
     private static class ApplianceRequest {
         private Long roomId;

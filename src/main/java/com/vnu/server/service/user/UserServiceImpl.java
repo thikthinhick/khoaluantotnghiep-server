@@ -59,5 +59,11 @@ public class UserServiceImpl implements UserDetailsService, UserService {
         }
 
     }
+
+    @Override
+    public void updateUser(User user) {
+        if(userRepository.existsByUsername(user.getUsername())) throw new ResourceNotFoundException("Not found user!");
+        User u = userRepository.findUserByUsername(user.getUsername());
+    }
 }
 

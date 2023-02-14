@@ -17,10 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashSet;
 import java.util.List;
@@ -30,6 +27,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@CrossOrigin
 public class  AuthController {
     private final UserRepository userRepository;
     private final JwtTokenProvider tokenProvider;
@@ -37,18 +35,22 @@ public class  AuthController {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@RequestBody AuthRequest auth){
-        if(userRepository.existsByUsername(auth.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Username đã tồn tại!"));
+    public ResponseEntity<?> registerUser(@RequestBody AuthRequest authRequest ) {
+        if (userRepository.existsByUsername(authRequest.getUsername())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Username sử dụng đã tồn tại!"));
+        }
+        if (userRepository.existsByEmail(authRequest.getEmail())) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Email sử dụng đã tồn tại"));
         }
         User user = User.builder()
-                .username(auth.getUsername())
-                .password(passwordEncoder.encode(auth.getPassword()))
+                .username(authRequest.getUsername())
+                .password(passwordEncoder.encode(authRequest.getPassword()))
                 .build();
         Set<Role> roles = new HashSet<>();
         Role role = roleRepository.findByName("USER").orElseThrow(() -> new RuntimeException("Role không được tìm thấy!"));
         roles.add(role);
         user.setRoles(roles);
+        user.setEmail(authRequest.getEmail());
         userRepository.save(user);
         return ResponseEntity.ok().body(new MessageResponse("Tạo tài khoản thành công!"));
     }
@@ -76,5 +78,6 @@ public class  AuthController {
     private static class AuthRequest{
         private String username;
         private String password;
+        private String email;
     }
 }
