@@ -23,6 +23,17 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    @Transient
+    private String token;
+
     public String getEmail() {
         return email;
     }

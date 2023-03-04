@@ -47,6 +47,7 @@ public class RoomController {
         if(id == null) return ResponseEntity.ok().body(roomService.getAll());
         return ResponseEntity.ok().body(roomService.getById(id, Long.parseLong(userId)));
     }
+    @GetMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/{roomId}/user/{userId}")
     public ResponseEntity<?> addUserToRoom(@PathVariable("roomId") Long roomId, @PathVariable("userId") Long userId) {

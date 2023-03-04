@@ -17,7 +17,9 @@ import java.util.Set;
 @ServerEndpoint(value = "/websocket", encoders = MessageEncoder.class, decoders = MessageDecoder.class)
 public class Socket {
     private Session session;
+    private String status;
     public static Set<Socket> sockets = new HashSet<>();
+
     @OnOpen
     public void onOpen(Session session) {
         log.info("Tạo kết nối!");
@@ -26,11 +28,18 @@ public class Socket {
     }
     @OnMessage
     public void onMessage(Session session, Message message) throws IOException {
-
+        switch (message.getTypeMessage()) {
+            case "SUBSCRIBE": {
+                this.status = "SUBSCRIBE";
+                break;
+            }
+            default: break;
+        }
     }
     @OnClose
     public void onClose(Session session) throws IOException {
         this.session.close();
+        sockets.remove(this);
     }
     @OnError
     public void onError(Session session, Throwable throwable) {

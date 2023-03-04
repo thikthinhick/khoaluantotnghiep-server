@@ -1,10 +1,15 @@
 package com.vnu.server.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
-public class MessageResponse {
+public class MessageResponse<T> {
     private String message;
+    private T info;
+    public MessageResponse(String message) {
+        this.message = message;
+    }
+    public MessageResponse(String message, T info) {
+        this.info = info;
+    }
 }

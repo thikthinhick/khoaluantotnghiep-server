@@ -12,5 +12,21 @@ import lombok.ToString;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Message {
     private String typeMessage;
-    private String title;
+    private Object data;
+
+    public String getTypeMessage() {
+        return typeMessage;
+    }
+
+    public void setTypeMessage(String typeMessage) {
+        this.typeMessage = typeMessage;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
+    }
 }

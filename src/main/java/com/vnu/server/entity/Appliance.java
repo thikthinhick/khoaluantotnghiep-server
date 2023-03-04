@@ -1,25 +1,33 @@
 package com.vnu.server.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Data;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties("room")
+@JsonIgnoreProperties({"room", "consumptions"})
 public class Appliance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String status;
     private String thumbnail;
     private Boolean category;
-    private Boolean running;
+    @OneToMany(mappedBy = "appliance")
+    private Set<Consumption> consumptions = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
+
+    public Set<Consumption> getConsumptions() {
+        return consumptions;
+    }
+
+    public void setConsumptions(Set<Consumption> consumptions) {
+        this.consumptions = consumptions;
+    }
 
     public Long getId() {
         return id;
@@ -37,13 +45,6 @@ public class Appliance {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getThumbnail() {
         return thumbnail;
@@ -61,13 +62,6 @@ public class Appliance {
         this.category = category;
     }
 
-    public Boolean getRunning() {
-        return running;
-    }
-
-    public void setRunning(Boolean running) {
-        this.running = running;
-    }
 
     public Room getRoom() {
         return room;
