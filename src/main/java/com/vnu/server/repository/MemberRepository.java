@@ -14,4 +14,5 @@ public interface MemberRepository extends JpaRepository<Member, MemberId> {
     List<Member> findMemberByUserId(Long userid);
     @Query("select m from Member m where m.user.id = ?1 and m.room.id = ?2")
     List<Member> findMemberByUserIdAndRoomId(Long userId, Long roomId);
+
 }

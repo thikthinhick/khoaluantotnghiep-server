@@ -14,7 +14,7 @@ public class Room {
     private String thumbnail;
     @OneToMany(mappedBy = "room")
     private Set<Appliance> appliances = new HashSet<>();
-    @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
+        @OneToMany(mappedBy = "room", cascade = CascadeType.ALL)
     private Set<Member> members = new HashSet<>();
 
     public Long getId() {

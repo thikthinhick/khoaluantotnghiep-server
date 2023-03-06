@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "applianceconsumption",
+  "private_key_id": "00abf2e96901f4ce67738f8c93b2f56bc96d1fdb",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCwc3SQJfoQuNQ1\nIFx8GcvnMPyaG5PkEfgUsjBAq39NGsWPDi5KUi69amw4bgITbqMv6ZoN2JmwFspJ\nBFrrBfD/viN1P7Q/4n1BJfR4odxYhV/jpsCESiEtw+GRNtEAiewl3SVSn8eUeLHQ\nZyDPtOQDI4hr3dobi0xXSpu4Wq0yiolym3VTdL3j3kxHL62holwh5B264CblvSJX\nc1pSLCchiACqtZzqrHiSgjVtFDwFz+OsfIFVwXjOn/ys1IlHthEvXzpLWpToJD90\nnJUbXYySqRY8t2GRDLY6YtL41RHnkjnbJf+sfQysvu4HYMCO6M5rvgkUqf+dhZYu\nQvVHfu25AgMBAAECggEAATbwPdhHFAOjsVBtVozaaJdfm8N2FYcyoxjVaHKNxCb7\npmgRdUFC0Vq4zzwhn0bfEHK+FNuRdkL35kAFjLHcJnSFe7aCLADn/hFv8P8jPEhB\nwFhK4bY9a3paVISxNFzer2WJ7ttK9UiN58p38ToUajmdxClRKaigMEcjEoYsRElp\nKtDG+ojmsdRXAT3G75Jo9dTA2nsBA4KoT9d1b6gWJ7pfVSrc+TDb1ZlZPcfI/qmz\nYdfDaOZntHOu9ETsIKmY+o42J2kT6JIYzchc6Y1kCrOZRUK+nYAavY8/H+9Zbx23\n1lrpg1nYhryo53XxIAQa+7VUIC3bOd0f0TwqOrjogQKBgQDZH746TAH4TznQ77g/\nqitGhg1FRMR6+1X1ddlZZUkJXauJagJU0fng9tBrGqAu0a7flB/e1xZw1ym4O9Xf\nNkb2/O9tiEMXfiCgND5mw+CN/kR73627mXmTkOtb1Or481LCMhR8X9fZM7LWyMKO\n870GzTFHv1RP29XoGoLLKa/qOQKBgQDQC2T5BoYBrCxFq28ZyHPfxmuPVntLJ2E/\nLsQNM87ddmLHq0YI3SM4go0Q+EgO7376SBaxTFbYGLjtbrlZgpZj88PhHyyWy4uI\nDbKNcOxgxUHupD8hv9aHFQJ2QcrRr20/A4JfVBo9kcS4572RmnkG7VJ4jQclT5Fc\nBANuEGUfgQKBgQDXOp0yYsgNIlP4prjo+0G8vgOHp7xxAJZcJP9Ym4uD6kOxitFW\nzXK7K0687P7eimKkJMxW9LW9E7y6cS33/3DnQyIAXPPM5O1ogYFeE0uU1fmDJd6t\nOV0IB78XH//w2hsuf8BI7iUknRfpy8b5N+ooRN1V9vaX1x663xTKWb+VGQKBgHkS\n6IR0Y3B9vpYdGt8qZSUJ2HbmoYIvPM0EblwwlmcUCpChAHUQHPs6HtaNZ4IppwAJ\nDAvKnY/Nc3HaSkvpT5SDvK868Twg4Ocg8ZSW7zmyEpjLRWJivnqGo5Qm3d4B9dYC\nONE5pLvIJXBmjVA7UcvSOXimuk3gbHvcahKXwAIBAoGBAKaJuWTPyPTFiLvtFFFh\nnyLXRcmGJDfLc3aArfLzqW+F0g80zqudw9Zk16Rw3HKw9dLSNj+xWr7TSA+clD9f\npNv9u5UozvmUzWHT4yRz3Hz0VwrR945RWYE8DKb1e6tAoNT7vN33cXII986KPNCS\nLro6YuxdKOjU/3nQccseKa6q\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-mhhc0@applianceconsumption.iam.gserviceaccount.com",
+  "client_id": "100585758646863612940",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-mhhc0%40applianceconsumption.iam.gserviceaccount.com"
+}

@@ -13,6 +13,7 @@ import java.util.Set;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

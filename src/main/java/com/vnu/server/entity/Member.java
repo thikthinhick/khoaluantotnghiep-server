@@ -2,6 +2,7 @@ package com.vnu.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.vnu.server.entity.ids.MemberId;
+import lombok.Builder;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -23,6 +24,10 @@ public class Member {
     @MapsId("roomId")
     @JoinColumn(name = "room_id")
     private Room room;
+
+    public Member() {
+
+    }
 
     public MemberId getMemberId() {
         return memberId;

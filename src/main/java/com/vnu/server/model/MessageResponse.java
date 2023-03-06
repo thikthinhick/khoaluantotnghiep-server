@@ -10,6 +10,7 @@ public class MessageResponse<T> {
         this.message = message;
     }
     public MessageResponse(String message, T info) {
+        this.message = message;
         this.info = info;
     }
 }
