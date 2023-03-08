@@ -1,8 +1,11 @@
 package com.vnu.server.controller;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.Gson;
 import com.vnu.server.common.FunctionPopular;
+import com.vnu.server.entity.Appliance;
 import com.vnu.server.entity.Room;
+import com.vnu.server.entity.User;
 import com.vnu.server.jwt.JwtTokenProvider;
 import com.vnu.server.model.MessageResponse;
 import com.vnu.server.model.RequestData;
@@ -22,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,7 +46,12 @@ public class RoomController {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);
         Room room = roomService.save(multipartFile, requestData);
-        return ResponseEntity.ok().body(new MessageResponse<Room>("Tạo phòng thành công", room));
+        return ResponseEntity.ok().body(new MessageResponse<RoomResponse>("Tạo phòng thành công", RoomResponse.builder().roomId(room.getId())
+                .currentWattage(100)
+                .roomName(room.getName())
+                .thumbnail(room.getThumbnail())
+//                .listThumbnailUser(new ArrayList<String>())
+                .build()));
     }
 
     @PutMapping
@@ -54,10 +63,10 @@ public class RoomController {
         return ResponseEntity.ok().body(new MessageResponse("Cập nhật thông tin phòng thành công!"));
     }
 
-    @DeleteMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> deleteRoom(@RequestBody Room room) {
-        roomService.delete(room.getId());
+    @DeleteMapping("/{roomId}")
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> deleteRoom(@PathVariable("roomId") Long roomId) {
+        roomService.delete(roomId);
         return ResponseEntity.ok().body(new MessageResponse("Xóa phòng thành công!"));
     }
 
@@ -71,18 +80,34 @@ public class RoomController {
                         RoomResponse.builder()
                                 .roomId(element.getId())
                                 .currentWattage(100)
-                                .nameRoom(element.getName())
+                                .roomName(element.getName())
                                 .thumbnail(element.getThumbnail())
                                 .totalAppliances(element.getAppliances().size())
-                                .listThumbnail(element.getMembers().stream().map(item -> item.getUser().getThumbnail()).collect(Collectors.toList()))
+//                                .listThumbnailUser(element.getMembers().stream().map(item -> item.getUser().getThumbnail()).collect(Collectors.toList()))
                                 .build()
                 );
             });
             return ResponseEntity.ok().body(new MessageResponse<List<RoomResponse>>("Lấy dữ liệu thành công!", roomResponses));
         }
-        String jwt = FunctionPopular.getJwtFromRequest(request);
-        String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
-        return ResponseEntity.ok().body(roomService.getById(id, Long.parseLong(userId)));
+//        String jwt = FunctionPopular.getJwtFromRequest(request);
+//        String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
+//        return ResponseEntity.ok().body(roomService.getById(id, Long.parseLong(userId)));
+        Room room = roomService.getById(id);
+        RoomResponse roomResponse = RoomResponse.builder()
+                .roomName(room.getName())
+                .roomId(room.getId())
+                .thumbnail(room.getThumbnail())
+                .appliances(room.getAppliances())
+                .descriptionRoom(room.getDescription())
+                .totalConsumption(1000)
+                .users(room.getMembers().stream().map(element -> User.builder()
+                        .thumbnail(element.getUser().getThumbnail())
+                        .id(element.getUser().getId())
+                        .username(element.getUser().getUsername())
+                        .build()).collect(Collectors.toList()))
+                .currentWattage(100)
+                .build();
+        return ResponseEntity.ok().body(roomResponse);
     }
 
 
@@ -92,17 +117,23 @@ public class RoomController {
         userService.addUserToRoom(userId, roomId);
         return ResponseEntity.ok().body(new MessageResponse("Thêm user vào phòng thành công!"));
     }
-
+    @PostMapping("/{roomId}/add_user_to_room")
+    public ResponseEntity<?> addUserToRoom(@PathVariable("roomId") Long roomId, @RequestBody RequestData requestData) {
+        userService.addListUserToRoom(requestData.getUserIds(), roomId);
+        return ResponseEntity.ok().body(new MessageResponse("Cập nhật thành viên trong phòng thành công!"));
+    }
     @Builder
     @Data
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class RoomResponse {
         private Long roomId;
         private String thumbnail;
-        private String nameRoom;
-        private int totalAppliances;
-        private int currentWattage;
-        private List<String> listThumbnail;
+        private String roomName;
+        private Integer totalAppliances;
+        private String descriptionRoom;
+        private Integer currentWattage;
+        private Integer totalConsumption;
+        private List<User> users;
+        private Set<Appliance> appliances;
     }
-
-
 }

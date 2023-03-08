@@ -4,7 +4,6 @@ import com.vnu.server.entity.Member;
 import com.vnu.server.entity.Room;
 import com.vnu.server.entity.User;
 import com.vnu.server.exception.ResourceNotFoundException;
-import com.vnu.server.jwt.JwtTokenProvider;
 import com.vnu.server.model.RequestData;
 import com.vnu.server.repository.MemberRepository;
 import com.vnu.server.repository.RoomRepository;
@@ -18,7 +17,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -38,6 +36,11 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    public Room getById(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Phòng " + roomId + " không được tìm thấy!"));
+    }
+
+    @Override
     public List<Room> getAll() {
         return roomRepository.findAll();
     }
@@ -46,34 +49,26 @@ public class RoomServiceImpl implements RoomService {
     @Transactional
     public Room save(MultipartFile multipartFile, RequestData data) {
         Room room = new Room();
-        room.setThumbnail(data.getThumbnailRoom());
-        room.setDescription(data.getDescriptionRoom());
-        room.setName(data.getRoomName());
-        List<User> users = data.getUserIds().stream()
-                .map(element -> userRepository.findById(element).orElseThrow(() -> new ResourceNotFoundException("Khong ton tai userId: " + element)))
-                .collect(Collectors.toList());
-        if(multipartFile != null) {
-            String urlImage = fileFirebaseService.upload(multipartFile);
-            room.setThumbnail(urlImage);
-        }
-        roomRepository.save(room);
-        List<Member> members = users.stream().
-                map(element -> {
-                    Member member = new Member();
-                    member.setRoom(room);
-                    member.setUser(element);
-                    return member;
-                }).collect(Collectors.toList());
-        memberRepository.saveAll(members);
+        saveRoom(multipartFile, data, room);
         return room;
     }
 
     @Override
     public Room update(MultipartFile multipartFile, RequestData data) {
         Room room = roomRepository.findById(data.getRoomId()).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong"));
-        room.setName(data.getRoomName());
-        System.out.println(room.getMembers().size());
+        saveRoom(multipartFile, data, room);
         return null;
+    }
+
+    private void saveRoom(MultipartFile multipartFile, RequestData data, Room room) {
+        room.setThumbnail(data.getThumbnailRoom());
+        room.setDescription(data.getDescriptionRoom());
+        room.setName(data.getRoomName());
+        if(multipartFile != null) {
+            String urlImage = fileFirebaseService.upload(multipartFile);
+            room.setThumbnail(urlImage);
+        }
+        roomRepository.save(room);
     }
 
     @Override
@@ -81,7 +76,6 @@ public class RoomServiceImpl implements RoomService {
         roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong!"));
         roomRepository.deleteById(roomId);
     }
-
 
     private String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");

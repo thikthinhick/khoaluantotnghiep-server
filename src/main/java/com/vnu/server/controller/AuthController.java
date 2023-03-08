@@ -1,15 +1,19 @@
 package com.vnu.server.controller;
 
+import com.vnu.server.entity.Member;
 import com.vnu.server.entity.Role;
 import com.vnu.server.entity.User;
+import com.vnu.server.exception.ResourceNotFoundException;
 import com.vnu.server.jwt.JwtTokenProvider;
 import com.vnu.server.model.JwtResponse;
 import com.vnu.server.model.MessageResponse;
 import com.vnu.server.model.MyUserDetails;
 import com.vnu.server.repository.RoleRepository;
+import com.vnu.server.repository.RoomRepository;
 import com.vnu.server.repository.TokenRepository;
 import com.vnu.server.repository.UserRepository;
 import com.vnu.server.service.EmailSender;
+import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +28,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import javax.mail.MessagingException;
 import java.util.HashSet;
 import java.util.List;
@@ -40,6 +45,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final JwtTokenProvider tokenProvider;
     private final RoleRepository roleRepository;
+    private final RoomRepository roomRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
@@ -90,6 +96,7 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok().body("Tạo tài khoản thành công!");
     }
+
     @PostMapping("/forgot_password")
     public ResponseEntity<?> forgotPassword(@RequestBody AuthRequest authRequest) {
         if (!userRepository.existsByEmail(authRequest.getEmail())) {
@@ -108,10 +115,11 @@ public class AuthController {
         }
         return ResponseEntity.ok().body("Kiểm tra email để reset mật khẩu!");
     }
+
     @GetMapping("/confirm_reset_password/{token}")
-    public ResponseEntity<?> confirmResetPassword( @PathVariable("token") String token) {
+    public ResponseEntity<?> confirmResetPassword(@PathVariable("token") String token) {
         User user = tokenRepository.get(token);
-        if(user == null) {
+        if (user == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Không thể xác thực cập nhật mật khẩu");
         }
         String access_token_reset = UUID.randomUUID().toString();
@@ -119,18 +127,21 @@ public class AuthController {
         tokenRepository.remove(token);
         return ResponseEntity.ok().body(new MessageResponse<String>("Lấy dữ liệu thành công", access_token_reset));
     }
+
     @PutMapping("/reset_password/{token}")
-    public ResponseEntity<?> resetPassword( @PathVariable("token") String token, @RequestBody User authRequest) {
+    public ResponseEntity<?> resetPassword(@PathVariable("token") String token, @RequestBody User authRequest) {
         User info = tokenRepository.get(token);
-        if(info == null) {
+        if (info == null) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Token không chính xác");
-        };
+        }
+        ;
         User user = userRepository.findUserByEmail(info.getEmail());
         user.setPassword(passwordEncoder.encode(authRequest.getPassword()));
         userRepository.save(user);
         tokenRepository.remove(token);
         return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật mật khẩu thành công"));
     }
+
     @PutMapping("/update_password")
     public ResponseEntity<?> updatePassword(@RequestBody User authRequest) {
         User user = userRepository.findUserByEmail(authRequest.getEmail());
@@ -138,6 +149,7 @@ public class AuthController {
         userRepository.save(user);
         return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật mật khẩu thành công"));
     }
+
     @PostMapping("/signin")
     public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
@@ -156,7 +168,25 @@ public class AuthController {
         return ResponseEntity.ok(new JwtResponse(jwt,
                 myUserDetails.getUser().getUsername(),
                 myUserDetails.getUser().getFullName(),
+                myUserDetails.getUser().getId(),
                 roles));
+    }
+
+    @GetMapping("/get_user")
+    public ResponseEntity<?> getUser(@RequestParam("room_id") Long roomId) {
+        List<User> users = userRepository.findAll();
+        List<Long> ids = roomRepository.getById(roomId)
+                .getMembers().stream()
+                .map(element -> element.getUser().getId()).collect(Collectors.toList());
+        List<UserResponse> userResponses = users.stream().map(element ->
+                UserResponse.builder()
+                        .username(element.getUsername())
+                        .id(element.getId())
+                        .thumbnail(element.getThumbnail())
+                        .checked(ids.contains(element.getId()))
+                        .build()
+        ).collect(Collectors.toList());
+        return ResponseEntity.ok().body(userResponses);
     }
 
     @Data
@@ -164,5 +194,14 @@ public class AuthController {
         private String username;
         private String password;
         private String email;
+    }
+
+    @Data
+    @Builder
+    private static class UserResponse {
+        private Long id;
+        private String username;
+        private String thumbnail;
+        private boolean checked;
     }
 }

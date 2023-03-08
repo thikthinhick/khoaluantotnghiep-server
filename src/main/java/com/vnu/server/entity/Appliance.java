@@ -1,6 +1,7 @@
 package com.vnu.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Builder;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -14,13 +15,22 @@ public class Appliance {
     private Long id;
     private String name;
     private String thumbnail;
+    private String description;
     private Boolean category;
     @OneToMany(mappedBy = "appliance")
     private Set<Consumption> consumptions = new HashSet<>();
+
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
     public Set<Consumption> getConsumptions() {
         return consumptions;
     }

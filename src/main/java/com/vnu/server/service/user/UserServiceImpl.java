@@ -20,6 +20,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.vnu.server.entity.Role.RoleName.READ;
 
 @Service
@@ -46,18 +48,26 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public void addUserToRoom(Long userId, Long roomId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Not found user!"));
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Not found room!"));
-        Role role = roleRepository.findByName(READ.name()).orElseThrow(() -> new ResourceNotFoundException("Not found role!"));
+//        Role role = roleRepository.findByName(READ.name()).orElseThrow(() -> new ResourceNotFoundException("Not found role!"));
         Member member = new Member();
         member.setUser(user);
         member.setRoom(room);
-        member.setRole(role);
+//        member.setRole(role);
         try{
             memberRepository.save(member);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    @Override
+    @Transactional
+    public void addListUserToRoom(List<Long> ids, Long roomId) {
+        memberRepository.deleteAll();
+        ids.forEach(userId -> {
+           this.addUserToRoom(userId, roomId);
+        });
     }
 
     @Override

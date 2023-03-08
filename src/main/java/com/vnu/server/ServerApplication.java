@@ -1,6 +1,7 @@
 package com.vnu.server;
 
 import com.google.gson.Gson;
+import com.vnu.server.repository.RoleRepository;
 import com.vnu.server.service.ConsumptionService;
 import com.vnu.server.service.FileFirebaseService;
 import lombok.AllArgsConstructor;
@@ -16,19 +17,14 @@ import java.util.List;
 @SpringBootApplication
 @AllArgsConstructor
 public class ServerApplication implements CommandLineRunner {
-    private final ConsumptionService consumptionService;
-    private final FileFirebaseService fileFirebaseService;
-
+    private final RoleRepository roleRepository;
     public static void main(String[] args) {
         SpringApplication.run(ServerApplication.class, args);
     }
 
     @Override
     public void run(String... args) throws InterruptedException {
-        String json = "{userIds:[1,1,1,1,1,1]}";
-        Gson gson = new Gson();
-        Object object = gson.fromJson(json, Test.class);
-        System.out.println(object);
+        System.out.println(roleRepository.findByName("READ"));
 
     }
     @Data
