@@ -1,6 +1,7 @@
 package com.vnu.server.model;
 
 import com.vnu.server.entity.Appliance;
+import com.vnu.server.entity.DbSchedule;
 import lombok.Data;
 
 import java.util.List;
@@ -18,5 +19,8 @@ public class RequestData {
     private String applianceName;
     private String applianceDescription;
     private Boolean applianceType;
+    private Long applianceId;
     private Long userId;
+
+    private DbSchedule schedule;
 }

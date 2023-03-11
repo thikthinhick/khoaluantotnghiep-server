@@ -19,7 +19,8 @@ public class Appliance {
     private Boolean category;
     @OneToMany(mappedBy = "appliance")
     private Set<Consumption> consumptions = new HashSet<>();
-
+    @OneToMany(mappedBy = "appliance")
+    private Set<DbSchedule> dbSchedules = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "room_id")
     private Room room;
@@ -55,6 +56,13 @@ public class Appliance {
         this.name = name;
     }
 
+    public Set<DbSchedule> getDbSchedules() {
+        return dbSchedules;
+    }
+
+    public void setDbSchedules(Set<DbSchedule> dbSchedules) {
+        this.dbSchedules = dbSchedules;
+    }
 
     public String getThumbnail() {
         return thumbnail;

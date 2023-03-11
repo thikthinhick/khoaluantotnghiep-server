@@ -1,13 +1,17 @@
 package com.vnu.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 
 @Entity
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @JsonIgnoreProperties("appliance")
 public class Consumption {
     @Id
@@ -17,14 +21,12 @@ public class Consumption {
     @JoinColumn(name = "appliance_id")
     private Appliance appliance;
     private int currentValue;
+    private int timeBands;
 
-    private Timestamp consumptionTime;
+    private String consumptionTime;
 
-    public Consumption() {
 
-    }
-
-    public Consumption(Long id, Appliance appliance, int currentValue, Timestamp consumptionTime) {
+    public Consumption(Long id, Appliance appliance, int currentValue, String consumptionTime) {
         this.id = id;
         this.appliance = appliance;
         this.currentValue = currentValue;
@@ -55,11 +57,27 @@ public class Consumption {
         this.appliance = appliance;
     }
 
-    public Timestamp getTime() {
+    public String getTime() {
         return consumptionTime;
     }
 
-    public void setTime(Timestamp time) {
+    public void setTime(String time) {
         this.consumptionTime = time;
+    }
+
+    public int getTimeBands() {
+        return timeBands;
+    }
+
+    public void setTimeBands(int timeBand) {
+        this.timeBands = timeBand;
+    }
+
+    public String getConsumptionTime() {
+        return consumptionTime;
+    }
+
+    public void setConsumptionTime(String consumptionTime) {
+        this.consumptionTime = consumptionTime;
     }
 }

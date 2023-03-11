@@ -5,16 +5,12 @@ import com.vnu.server.entity.Consumption;
 import com.vnu.server.model.DataConsumption;
 import com.vnu.server.model.MessageConsumption;
 import com.vnu.server.socket.Socket;
-import com.vnu.server.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -57,7 +53,7 @@ public class RedisMessageSubscriber implements MessageListener {
                 for (Long key : data.keySet()) {
                     consumptionService.save(key,
                             Consumption.builder()
-                                    .consumptionTime(StringUtils.convertStringToTimestamp(messageConsumption.getTime()))
+                                    .consumptionTime(messageConsumption.getTime())
                                     .currentValue(data.get(key))
                                     .build());
                     sum += data.get(key);

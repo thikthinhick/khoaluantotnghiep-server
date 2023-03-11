@@ -1,26 +1,42 @@
 package com.vnu.server.controller;
 
 import com.vnu.server.model.DataResponse;
+import com.vnu.server.service.statistic.StatisticService;
+import com.vnu.server.utils.StringUtils;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Date;
+
 @RestController
 @CrossOrigin
 @RequestMapping("/api/home")
+@AllArgsConstructor
 public class HomeController {
+    private final StatisticService statisticService;
     @GetMapping
     public ResponseEntity<?> getData() {
+        Date date = new Date();
+        String day = StringUtils.convertDateToString(date, "yyyy-MM-dd");
+        String month = StringUtils.convertDateToString(date, "yyyy-MM");
+        Long consumptionInDay = statisticService.getTotalConsumptionDay(day);
+        Long consumptionInMonth = statisticService.getTotalConsumptionMonth(StringUtils.convertDateToString(date, "yyyy-MM"));
+        Long consumptionTotal = statisticService.getTotalConsumption();
+        int costLastMonth = (int) Math.round(statisticService.getPrice(StringUtils.lastOneMonth(date)));
+        int costCurrentMonth = (int)Math.round(statisticService.getPrice(month));
+        int costTotal = (int) Math.round(statisticService.getPrice(""));
         DataResponse dataResponse = DataResponse.builder()
-                .consumptionInDay("100.9")
-                .consumptionInMonth("2000.2")
-                .consumptionInYear("20330.39")
-                .consumptionTotal("100020.78")
-                .costLastMonth("120.000")
-                .costCurrentMonth("52.000")
-                .costTotal("1.200.000")
+                .consumptionInDay(consumptionInDay.toString())
+                .consumptionInMonth(consumptionInMonth.toString())
+                .consumptionInYear(consumptionTotal.toString())
+                .consumptionTotal(consumptionTotal.toString())
+                .costLastMonth(StringUtils.convertNumberToCost(costLastMonth))
+                .costCurrentMonth(StringUtils.convertNumberToCost(costCurrentMonth))
+                .costTotal(StringUtils.convertNumberToCost(costTotal))
                 .build();
         return ResponseEntity.ok(dataResponse);
     }

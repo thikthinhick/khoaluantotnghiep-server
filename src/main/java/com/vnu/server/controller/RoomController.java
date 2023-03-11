@@ -50,7 +50,7 @@ public class RoomController {
                 .currentWattage(100)
                 .roomName(room.getName())
                 .thumbnail(room.getThumbnail())
-//                .listThumbnailUser(new ArrayList<String>())
+//                .users(room.getMembers().map)
                 .build()));
     }
 
@@ -83,7 +83,11 @@ public class RoomController {
                                 .roomName(element.getName())
                                 .thumbnail(element.getThumbnail())
                                 .totalAppliances(element.getAppliances().size())
-//                                .listThumbnailUser(element.getMembers().stream().map(item -> item.getUser().getThumbnail()).collect(Collectors.toList()))
+                                .users(element.getMembers().stream().map(item -> User.builder()
+                                        .thumbnail(item.getUser().getThumbnail())
+                                        .id(item.getUser().getId())
+                                        .username(item.getUser().getUsername())
+                                        .build()).collect(Collectors.toList()))
                                 .build()
                 );
             });
@@ -117,11 +121,13 @@ public class RoomController {
         userService.addUserToRoom(userId, roomId);
         return ResponseEntity.ok().body(new MessageResponse("Thêm user vào phòng thành công!"));
     }
+
     @PostMapping("/{roomId}/add_user_to_room")
     public ResponseEntity<?> addUserToRoom(@PathVariable("roomId") Long roomId, @RequestBody RequestData requestData) {
         userService.addListUserToRoom(requestData.getUserIds(), roomId);
         return ResponseEntity.ok().body(new MessageResponse("Cập nhật thành viên trong phòng thành công!"));
     }
+
     @Builder
     @Data
     @JsonInclude(JsonInclude.Include.NON_NULL)

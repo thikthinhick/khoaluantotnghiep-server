@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional
     public void addListUserToRoom(List<Long> ids, Long roomId) {
-        memberRepository.deleteAll();
+        memberRepository.deleteByUserId(roomId);
         ids.forEach(userId -> {
            this.addUserToRoom(userId, roomId);
         });

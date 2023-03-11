@@ -6,10 +6,10 @@ import com.vnu.server.entity.Room;
 import com.vnu.server.exception.ResourceNotFoundException;
 import com.vnu.server.jwt.JwtTokenProvider;
 import com.vnu.server.model.RequestData;
-import com.vnu.server.repository.ApplianceRepository;
-import com.vnu.server.repository.MemberRepository;
-import com.vnu.server.repository.RoomRepository;
+import com.vnu.server.repository.*;
+import com.vnu.server.service.ConsumptionService;
 import com.vnu.server.service.FileFirebaseService;
+import com.vnu.server.service.schedule.ScheduleService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,6 +29,9 @@ public class ApplianceServiceImpl implements ApplianceService{
     private final RoomRepository roomRepository;
     private final FileFirebaseService fileFirebaseService;
     private final MemberRepository memberRepository;
+    private final ScheduleRepository scheduleRepository;
+    private final ConsumptionRepository consumptionRepository;
+
 
     @Override
     public void save(Appliance appliance, Long userId, Long roomId) {
@@ -47,6 +50,14 @@ public class ApplianceServiceImpl implements ApplianceService{
 
     @Override
     @Transactional
+    public void delete(Long applianceId) {
+        consumptionRepository.deleteByApplianceId(applianceId);
+        scheduleRepository.deleteDbScheduleByApplianceId(applianceId);
+        applianceRepository.deleteById(applianceId);
+    }
+
+    @Override
+    @Transactional
     public Appliance save(MultipartFile multipartFile, RequestData requestData) {
         Room room = roomRepository.findById(requestData.getRoomId()).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong"));
         Appliance appliance = new  Appliance();
@@ -54,7 +65,7 @@ public class ApplianceServiceImpl implements ApplianceService{
         appliance.setName(requestData.getApplianceName());
         appliance.setRoom(room);
         appliance.setCategory(requestData.getApplianceType());
-        if(!multipartFile.isEmpty()) {
+        if(multipartFile != null) {
             appliance.setThumbnail(fileFirebaseService.upload(multipartFile));
         }
         applianceRepository.save(appliance);
