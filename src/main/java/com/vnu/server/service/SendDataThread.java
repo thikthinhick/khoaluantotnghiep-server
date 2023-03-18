@@ -1,6 +1,7 @@
 package com.vnu.server.service;
 
 import com.vnu.server.model.DataConsumption;
+import com.vnu.server.socket.MessageSocket;
 import com.vnu.server.socket.Socket;
 import com.vnu.server.utils.StringUtils;
 
@@ -22,7 +23,9 @@ public class SendDataThread extends Thread {
                 if (count == limit) {
 
                     Socket.sockets.forEach(element -> {
-                        element.sendMessage(new com.vnu.server.socket.Message("CHART_HOME", new DataConsumption(StringUtils.convertDateToString(new Date(), "yyyy-MM-dd HH:mm:ss"), 0)));
+                        element.sendMessage(MessageSocket.builder().typeMessage("CHART_HOME")
+                                .data (new DataConsumption(StringUtils.convertDateToString(new Date(), "yyyy-MM-dd HH:mm:ss"), 0))
+                                .build());
                     });
                     count = 0;
                 }

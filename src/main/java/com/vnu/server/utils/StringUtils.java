@@ -5,6 +5,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 public class StringUtils {
 
@@ -20,11 +21,18 @@ public class StringUtils {
         SimpleDateFormat sampleDateFormat = new SimpleDateFormat(format);
         return sampleDateFormat.format(date);
     }
+    public static String convertDateToString(Date date, String format, Locale locale) {
+        SimpleDateFormat sampleDateFormat = new SimpleDateFormat(format, locale);
+        return sampleDateFormat.format(date);
+    }
     public static String lastOneMonth(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.MONTH, 1);
         return convertDateToString(cal.getTime(), "yyyy-MM");
+    }
+    public static String convertJunToNumber(Long value) {
+        return String.valueOf((double)Math.round((double)value / 36000) / 100);
     }
     public static String convertNumberToCost(int number) {
         DecimalFormat formatter = new DecimalFormat("###,###,###");

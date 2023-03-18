@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonIgnoreProperties({"room", "consumptions"})
+@JsonIgnoreProperties({"consumptions"})
 public class Appliance {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +17,14 @@ public class Appliance {
     private String thumbnail;
     private String description;
     private Boolean category;
+    private Boolean status;
     @OneToMany(mappedBy = "appliance")
     private Set<Consumption> consumptions = new HashSet<>();
     @OneToMany(mappedBy = "appliance")
     private Set<DbSchedule> dbSchedules = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "room_id")
+    @JsonIgnoreProperties({"appliances", "members"})
     private Room room;
 
     public String getDescription() {
@@ -87,5 +89,13 @@ public class Appliance {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 }

@@ -7,12 +7,12 @@ import javax.websocket.EncodeException;
 import javax.websocket.Encoder;
 import javax.websocket.EndpointConfig;
 
-public class MessageEncoder implements Encoder.Text<Message> {
+public class MessageEncoder implements Encoder.Text<MessageSocket> {
 
     private static Gson gson = new Gson();
 
     @Override
-    public String encode(Message message) throws EncodeException {
+    public String encode(MessageSocket message) throws EncodeException {
         String json = gson.toJson(message);
         return json;
     }

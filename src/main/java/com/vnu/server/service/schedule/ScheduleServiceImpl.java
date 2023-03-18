@@ -17,10 +17,12 @@ public class ScheduleServiceImpl implements ScheduleService{
 
     private final ApplianceRepository applianceRepository;
     @Override
-    public void create(DbSchedule schedule, Long applianceId) {
+    public DbSchedule create(DbSchedule schedule, Long applianceId) {
         Appliance appliance  = applianceRepository.findById(applianceId).orElseThrow(() -> new ResourceNotFoundException("Not found appliance!"));
+        schedule.setStatus(true);
         schedule.setAppliance(appliance);
         scheduleRepository.save(schedule);
+        return schedule;
     }
 
     @Override
@@ -31,6 +33,12 @@ public class ScheduleServiceImpl implements ScheduleService{
 
     @Override
     public void update(DbSchedule schedule) {
-        if(!scheduleRepository.existsById(schedule.getId())) throw new ResourceNotFoundException("Not found schedule!");
+        System.out.println(schedule.toString());
+       DbSchedule dbSchedule = scheduleRepository.findById(schedule.getId()).orElseThrow(() -> new ResourceNotFoundException("Not found schedule"));
+       dbSchedule.setEndDate(schedule.getEndDate());
+       dbSchedule.setStartDate(schedule.getStartDate());
+       dbSchedule.setName(schedule.getName());
+       dbSchedule.setRepeatDay(schedule.getRepeatDay());
+       scheduleRepository.save(dbSchedule);
     }
 }

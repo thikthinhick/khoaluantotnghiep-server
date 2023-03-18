@@ -3,7 +3,9 @@ package com.vnu.server.service;
 import com.google.gson.Gson;
 import com.vnu.server.entity.Consumption;
 import com.vnu.server.model.DataConsumption;
+import com.vnu.server.model.Detail;
 import com.vnu.server.model.MessageConsumption;
+import com.vnu.server.socket.MessageSocket;
 import com.vnu.server.socket.Socket;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -15,6 +17,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Set;
 
 @Service
@@ -27,7 +30,7 @@ public class RedisMessageSubscriber implements MessageListener {
         this.consumptionService = consumptionService;
     }
 
-    private SendDataThread thread = new SendDataThread( 20);
+    private SendDataThread thread = new SendDataThread(20);
 
     @PostConstruct
     private void init() {
@@ -42,9 +45,12 @@ public class RedisMessageSubscriber implements MessageListener {
             Gson gson = new Gson();
             MessageConsumption messageConsumption = gson.fromJson((String) object, MessageConsumption.class);
             Set<Long> keys = messageConsumption.getData().keySet();
+            HashMap<Long, Integer> roomsData = new HashMap<>();
             for (Long key : keys) {
-                int value = messageConsumption.getData().get(key);
+                int value = messageConsumption.getData().get(key).getValue();
+                Long roomId = messageConsumption.getData().get(key).getRoomId();
                 data.merge(key, value, Integer::sum);
+                roomsData.merge(roomId, value, Integer::sum);
                 total += value;
             }
             int second = Integer.parseInt(messageConsumption.getTime().split(":")[2]);
@@ -60,13 +66,39 @@ public class RedisMessageSubscriber implements MessageListener {
                 }
                 int finalSum = sum;
                 Socket.sockets.forEach(element -> {
-                    element.sendMessage(new com.vnu.server.socket.Message("CHART_HOME", new DataConsumption(messageConsumption.getTime(), finalSum)));
+                    if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_HOME")) {
+                        element.sendMessage(MessageSocket.builder()
+                                .typeMessage("CHART_HOME")
+                                .data(new DataConsumption(messageConsumption.getTime(), finalSum))
+                                .build());
+                    }
+
                 });
                 SendDataThread.count = 0;
                 data = new HashMap<>();
             }
             Socket.sockets.forEach(element -> {
-                element.sendMessage(new com.vnu.server.socket.Message("SPEED_METTER", new DataConsumption(messageConsumption.getTime(), total)));
+                if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_ROOMS")) {
+                    element.sendMessage(MessageSocket.builder()
+                            .typeMessage("SPEED_METTER_ROOMS")
+                            .data(roomsData)
+                            .build());
+                }
+                if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_HOME")) {
+                    element.sendMessage(MessageSocket.builder().typeMessage("SPEED_METTER")
+                            .data(new DataConsumption(messageConsumption.getTime(), total))
+                            .build());
+                }
+                if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_ROOM")) {
+                    HashMap<Long, Integer> wattInRoom = new HashMap<>();
+                    for(Long key: keys) {
+                        Detail detail = messageConsumption.getData().get(key);
+                        if(Objects.equals(detail.getRoomId(), element.getRoomId())) wattInRoom.put(key, detail.getValue());
+                    }
+                    element.sendMessage(MessageSocket.builder().typeMessage("SPEED_METTER_ROOM")
+                            .data(wattInRoom)
+                            .build());
+                }
             });
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
@@ -78,5 +110,9 @@ public class RedisMessageSubscriber implements MessageListener {
         ByteArrayInputStream in = new ByteArrayInputStream(data);
         ObjectInputStream is = new ObjectInputStream(in);
         return is.readObject();
+    }
+
+    private static class RoomConsumption {
+
     }
 }

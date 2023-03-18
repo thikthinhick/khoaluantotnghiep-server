@@ -3,10 +3,12 @@ package com.vnu.server.model;
 import com.vnu.server.entity.Appliance;
 import com.vnu.server.entity.DbSchedule;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 //convert String request data to object
 @Data
+@ToString
 public class RequestData {
     private Long roomId;
     private String roomName;
@@ -23,4 +25,5 @@ public class RequestData {
     private Long userId;
 
     private DbSchedule schedule;
+    private Long scheduleId;
 }

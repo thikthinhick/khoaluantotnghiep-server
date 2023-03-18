@@ -9,7 +9,7 @@ public interface StatisticService {
     Long getTotalConsumptionYear(String year);
     Long getTotalConsumption(Long applianceId);
     Long getTotalConsumption();
-
+    Long getTotalConsumptionByRoom(String date, Long roomId);
     Double getPrice(String day, Long applianceId);
     Double getPrice(String day);
 }

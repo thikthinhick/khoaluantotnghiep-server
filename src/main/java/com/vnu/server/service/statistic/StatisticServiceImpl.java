@@ -35,14 +35,14 @@ public class StatisticServiceImpl implements StatisticService{
     public Long getTotalConsumptionMonth(String month, Long applianceId) {
         String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionRepository.getTotalConsumptionDay(now + "%", applianceId)
-                + consumptionDayRepository.getTotalConsumption(now.substring(0, 7) + "%", applianceId);
+                + consumptionDayRepository.getTotalConsumption(month + "%", applianceId);
     }
 
     @Override
     public Long getTotalConsumptionMonth(String month) {
         String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionRepository.getTotalConsumptionDay(now + "%")
-                + consumptionDayRepository.getTotalConsumption(now.substring(0, 7) + "%");
+                + consumptionDayRepository.getTotalConsumption(month + "%");
 
     }
 
@@ -50,14 +50,14 @@ public class StatisticServiceImpl implements StatisticService{
     public Long getTotalConsumptionYear(String year, Long applianceId) {
         String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionRepository.getTotalConsumptionDay(now + "%", applianceId)
-                + consumptionDayRepository.getTotalConsumption(now.substring(0, 4) + "%", applianceId);
+                + consumptionDayRepository.getTotalConsumption(year + "%", applianceId);
     }
 
     @Override
     public Long getTotalConsumptionYear(String year) {
         String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionRepository.getTotalConsumptionDay(now + "%")
-                + consumptionDayRepository.getTotalConsumption(now + "%");
+                + consumptionDayRepository.getTotalConsumption(year + "%");
     }
 
     @Override
@@ -70,6 +70,12 @@ public class StatisticServiceImpl implements StatisticService{
     public Long getTotalConsumption() {
         String now = StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionDayRepository.getTotal() + consumptionRepository.getTotalConsumptionDay(now + "%");
+    }
+
+    @Override
+    public Long getTotalConsumptionByRoom(String date, Long roomId) {
+        String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
+        return consumptionDayRepository.getTotalConsumptionByRoom(date + "%", roomId);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.vnu.server.controller;
 
+import com.vnu.server.entity.DbSchedule;
 import com.vnu.server.model.MessageResponse;
 import com.vnu.server.model.RequestData;
 import com.vnu.server.repository.ScheduleRepository;
@@ -17,8 +18,18 @@ public class ScheduleController {
     private final ScheduleRepository scheduleRepository;
     @PostMapping
     ResponseEntity<?> createSchedule(@RequestBody RequestData requestData) {
-        scheduleService.create(requestData.getSchedule(), requestData.getApplianceId());
-        return ResponseEntity.ok().body(new MessageResponse<>("Create schedule success!"));
+        DbSchedule dbSchedule = scheduleService.create(requestData.getSchedule(), requestData.getApplianceId());
+        return ResponseEntity.ok().body(new MessageResponse<>("Create schedule success!", dbSchedule));
+    }
+    @PutMapping
+    ResponseEntity<?> updateSchedule(@RequestBody RequestData requestData) {
+        scheduleService.update(requestData.getSchedule());
+        return ResponseEntity.ok().body(new MessageResponse<>("Update schedule success!"));
+    }
+    @DeleteMapping
+    ResponseEntity<?> deleteSchedule(@RequestBody RequestData requestData) {
+        scheduleService.delete(requestData.getUserId(),  requestData.getScheduleId());
+        return ResponseEntity.ok().body(new MessageResponse<>("Delete schedule success!"));
     }
     @GetMapping
     ResponseEntity<?> getAllSchedule() {

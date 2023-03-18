@@ -15,10 +15,9 @@ public class DbSchedule {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private Time startDate;
-    private Time endDate;
+    private String startDate;
+    private String endDate;
     private String repeatDay;
-    @Column(columnDefinition = "boolean default false")
     private Boolean status;
     @ManyToOne
     @JoinColumn(name = "appliance_id")
@@ -40,7 +39,7 @@ public class DbSchedule {
         this.name = name;
     }
 
-    public Time getStartDate() {
+    public String getStartDate() {
         return startDate;
     }
 
@@ -52,15 +51,15 @@ public class DbSchedule {
         this.status = status;
     }
 
-    public void setStartDate(Time startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public Time getEndDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Time endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 

@@ -30,10 +30,10 @@ public class HomeController {
         int costCurrentMonth = (int)Math.round(statisticService.getPrice(month));
         int costTotal = (int) Math.round(statisticService.getPrice(""));
         DataResponse dataResponse = DataResponse.builder()
-                .consumptionInDay(consumptionInDay.toString())
-                .consumptionInMonth(consumptionInMonth.toString())
-                .consumptionInYear(consumptionTotal.toString())
-                .consumptionTotal(consumptionTotal.toString())
+                .consumptionInDay(StringUtils.convertJunToNumber(consumptionInDay))
+                .consumptionInMonth(StringUtils.convertJunToNumber(consumptionInMonth))
+                .consumptionInYear(StringUtils.convertJunToNumber(consumptionInMonth))
+                .consumptionTotal(StringUtils.convertJunToNumber(consumptionTotal))
                 .costLastMonth(StringUtils.convertNumberToCost(costLastMonth))
                 .costCurrentMonth(StringUtils.convertNumberToCost(costCurrentMonth))
                 .costTotal(StringUtils.convertNumberToCost(costTotal))

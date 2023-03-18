@@ -1,18 +1,19 @@
 package com.vnu.server.model;
 
 import com.google.gson.Gson;
+import com.vnu.server.model.Detail;
 
 import java.util.HashMap;
 
 public class MessageConsumption {
-    HashMap<Long, Integer> data = new HashMap<>();
     private String time;
+    HashMap<Long, Detail> data = new HashMap<>();
 
-    public HashMap<Long, Integer> getData() {
+    public HashMap<Long, Detail> getData() {
         return data;
     }
 
-    public void setData(HashMap<Long, Integer> data) {
+    public void setData(HashMap<Long, Detail> data) {
         this.data = data;
     }
 

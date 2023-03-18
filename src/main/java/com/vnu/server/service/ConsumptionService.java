@@ -43,7 +43,7 @@ public class ConsumptionService {
             map.put(element.getTime(), element.getCurrentValue());
         });
         List<DataConsumption> data = new ArrayList<>();
-        for(int i = 70 ;i >= 0; i--) {
+        for(int i = 75 ;i >= 0; i--) {
             String date = convertDateToString(increaseDate(now, - i * 15), "yyyy-MM-dd HH:mm:ss");
             if(map.get(date) != null) data.add(new DataConsumption(date, map.get(date)));
             else data.add(new DataConsumption(date, 0));

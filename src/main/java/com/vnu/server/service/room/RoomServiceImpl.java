@@ -57,10 +57,11 @@ public class RoomServiceImpl implements RoomService {
     public Room update(MultipartFile multipartFile, RequestData data) {
         Room room = roomRepository.findById(data.getRoomId()).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong"));
         saveRoom(multipartFile, data, room);
-        return null;
+        return room;
     }
 
     private void saveRoom(MultipartFile multipartFile, RequestData data, Room room) {
+        if(data.getThumbnailRoom() != null)
         room.setThumbnail(data.getThumbnailRoom());
         room.setDescription(data.getDescriptionRoom());
         room.setName(data.getRoomName());

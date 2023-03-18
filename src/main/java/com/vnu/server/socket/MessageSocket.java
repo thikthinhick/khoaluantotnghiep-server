@@ -2,16 +2,14 @@ package com.vnu.server.socket;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Builder;
 
-@NoArgsConstructor
-@ToString
-@AllArgsConstructor
+@Builder
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Message {
+public class MessageSocket {
     private String typeMessage;
+    private Long applianceId;
+    private Long roomId;
     private Object data;
 
     public String getTypeMessage() {
@@ -28,5 +26,21 @@ public class Message {
 
     public void setData(Object data) {
         this.data = data;
+    }
+
+    public Long getApplianceId() {
+        return applianceId;
+    }
+
+    public void setApplianceId(Long applianceId) {
+        this.applianceId = applianceId;
+    }
+
+    public Long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
     }
 }

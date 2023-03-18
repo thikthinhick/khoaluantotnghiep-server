@@ -1,8 +1,12 @@
 package com.vnu.server.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.vnu.server.entity.Appliance;
+import com.vnu.server.entity.DbSchedule;
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.List;
 
 @Data
 @Builder

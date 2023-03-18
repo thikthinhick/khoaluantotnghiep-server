@@ -12,7 +12,9 @@ import com.vnu.server.model.RequestData;
 import com.vnu.server.service.FileFirebaseService;
 import com.vnu.server.service.appliance.ApplianceService;
 import com.vnu.server.service.room.RoomService;
+import com.vnu.server.service.statistic.StatisticService;
 import com.vnu.server.service.user.UserService;
+import com.vnu.server.utils.StringUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,6 +42,7 @@ public class RoomController {
     private final FileFirebaseService fileFirebaseService;
     private final UserService userService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final StatisticService statisticService;
 
     @PostMapping
 //    @PreAuthorize("hasAuthority('ADMIN')")
@@ -47,27 +51,29 @@ public class RoomController {
         RequestData requestData = gson.fromJson(data, RequestData.class);
         Room room = roomService.save(multipartFile, requestData);
         return ResponseEntity.ok().body(new MessageResponse<RoomResponse>("Tạo phòng thành công", RoomResponse.builder().roomId(room.getId())
-                .currentWattage(100)
                 .roomName(room.getName())
                 .thumbnail(room.getThumbnail())
-//                .users(room.getMembers().map)
                 .build()));
     }
 
     @PutMapping
 //    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<?> updateRoom(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
+    public ResponseEntity<?> updateRoom(@RequestParam("id") Long id, @RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);
-        roomService.update(multipartFile, requestData);
-        return ResponseEntity.ok().body(new MessageResponse("Cập nhật thông tin phòng thành công!"));
+        requestData.setRoomId(id);
+        Room room = roomService.update(multipartFile, requestData);
+        return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật thông tin phòng thành công!",  RoomResponse.builder().roomId(room.getId())
+                .roomName(room.getName())
+                .thumbnail(room.getThumbnail())
+                .build()));
     }
 
     @DeleteMapping("/{roomId}")
 //    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteRoom(@PathVariable("roomId") Long roomId) {
         roomService.delete(roomId);
-        return ResponseEntity.ok().body(new MessageResponse("Xóa phòng thành công!"));
+        return ResponseEntity.ok().body(new MessageResponse<>("Xóa phòng thành công!"));
     }
 
     @GetMapping
@@ -83,6 +89,7 @@ public class RoomController {
                                 .roomName(element.getName())
                                 .thumbnail(element.getThumbnail())
                                 .totalAppliances(element.getAppliances().size())
+                                .descriptionRoom(element.getDescription())
                                 .users(element.getMembers().stream().map(item -> User.builder()
                                         .thumbnail(item.getUser().getThumbnail())
                                         .id(item.getUser().getId())
@@ -97,13 +104,16 @@ public class RoomController {
 //        String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
 //        return ResponseEntity.ok().body(roomService.getById(id, Long.parseLong(userId)));
         Room room = roomService.getById(id);
+        Date date = new Date();
+        String month = StringUtils.convertDateToString(date, "yyyy-MM");
+        Long totalConsumptionMonth = statisticService.getTotalConsumptionByRoom(month, id);
         RoomResponse roomResponse = RoomResponse.builder()
                 .roomName(room.getName())
                 .roomId(room.getId())
                 .thumbnail(room.getThumbnail())
                 .appliances(room.getAppliances())
                 .descriptionRoom(room.getDescription())
-                .totalConsumption(1000)
+                .totalConsumptionMonth(StringUtils.convertJunToNumber(totalConsumptionMonth))
                 .users(room.getMembers().stream().map(element -> User.builder()
                         .thumbnail(element.getUser().getThumbnail())
                         .id(element.getUser().getId())
@@ -138,7 +148,7 @@ public class RoomController {
         private Integer totalAppliances;
         private String descriptionRoom;
         private Integer currentWattage;
-        private Integer totalConsumption;
+        private String totalConsumptionMonth;
         private List<User> users;
         private Set<Appliance> appliances;
     }
