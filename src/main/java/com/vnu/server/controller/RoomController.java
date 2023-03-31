@@ -2,7 +2,6 @@ package com.vnu.server.controller;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.gson.Gson;
-import com.vnu.server.common.FunctionPopular;
 import com.vnu.server.entity.Appliance;
 import com.vnu.server.entity.Room;
 import com.vnu.server.entity.User;
@@ -45,7 +44,7 @@ public class RoomController {
     private final StatisticService statisticService;
 
     @PostMapping
-//    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> createRoom(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);
@@ -57,7 +56,6 @@ public class RoomController {
     }
 
     @PutMapping
-//    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateRoom(@RequestParam("id") Long id, @RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);

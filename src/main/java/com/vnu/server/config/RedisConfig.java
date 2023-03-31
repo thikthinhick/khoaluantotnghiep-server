@@ -15,6 +15,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 public class RedisConfig {
     @Autowired
     private ConsumptionService consumptionService;
+
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         JedisConnectionFactory jedisConFactory
@@ -30,10 +31,13 @@ public class RedisConfig {
         template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }
+
     @Bean
     MessageListenerAdapter messageListener() {
         return new MessageListenerAdapter(new RedisMessageSubscriber(consumptionService));
     }
+
+
     @Bean
     RedisMessageListenerContainer redisContainer() {
         RedisMessageListenerContainer container
@@ -42,8 +46,10 @@ public class RedisConfig {
         container.addMessageListener(messageListener(), topic());
         return container;
     }
+
     @Bean
     ChannelTopic topic() {
         return new ChannelTopic("message");
     }
+
 }

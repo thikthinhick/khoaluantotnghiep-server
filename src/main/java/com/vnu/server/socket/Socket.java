@@ -47,7 +47,7 @@ public class Socket {
                 break;
             }
             case "SUBSCRIBE_APPLIANCE": {
-                this.status = "SUBSCRIBE_ROOM";
+                this.status = "SUBSCRIBE_APPLIANCE";
                 this.applianceId = message.getApplianceId();
                 break;
             }

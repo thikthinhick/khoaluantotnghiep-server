@@ -21,9 +21,11 @@ public class StringUtils {
         SimpleDateFormat sampleDateFormat = new SimpleDateFormat(format);
         return sampleDateFormat.format(date);
     }
-    public static String convertDateToString(Date date, String format, Locale locale) {
-        SimpleDateFormat sampleDateFormat = new SimpleDateFormat(format, locale);
-        return sampleDateFormat.format(date);
+    public static Date increaseDay(Date date, int value) {
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(Calendar.DATE, value);
+        return c.getTime();
     }
     public static String lastOneMonth(Date date) {
         Calendar cal = Calendar.getInstance();

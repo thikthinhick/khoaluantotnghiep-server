@@ -8,10 +8,10 @@ import com.vnu.server.model.MessageResponse;
 import com.vnu.server.model.RequestData;
 import com.vnu.server.repository.ApplianceRepository;
 import com.vnu.server.service.appliance.ApplianceService;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import com.vnu.server.service.notification.NotificationService;
+import com.vnu.server.service.statistic.StatisticService;
+import com.vnu.server.utils.StringUtils;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,6 +35,8 @@ import java.util.stream.Collectors;
 public class ApplianceController {
     private final ApplianceService applianceService;
     private final ApplianceRepository applianceRepository;
+    private final StatisticService statisticService;
+    private final NotificationService notificationService;
 
     @PostMapping
     public ResponseEntity<?> createAppliance(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
@@ -46,24 +53,62 @@ public class ApplianceController {
 
     @GetMapping
     public ResponseEntity<?> getAppliance(@RequestParam(name = "id", required = false) Long applianceId) {
+        Date date = new Date();
+        String month = StringUtils.convertDateToString(date, "yyyy-MM");
         if (applianceId == null) return ResponseEntity.ok().body(applianceRepository.findAll());
-        return ResponseEntity.ok().body(applianceRepository.findById(applianceId).orElseThrow(() -> new ResourceNotFoundException("not found appliance")));
+        Appliance appliance = applianceRepository.findById(applianceId).orElseThrow(() -> new ResourceNotFoundException("not found appliance"));
+        Long consumptionCurrentMonth = statisticService.getTotalConsumptionMonth(month, applianceId);
+        Long consumptionTotal = statisticService.getTotalConsumption(applianceId);
+        int costCurrentMonth = (int) Math.round(statisticService.getPrice(month, applianceId));
+        int costTotal = (int) Math.round(statisticService.getPrice("", applianceId));
+        ApplianceRequest applianceRequest = new ApplianceRequest();
+        applianceRequest.setAppliance(appliance);
+        applianceRequest.setConsumptionTotal(StringUtils.convertJunToNumber(consumptionTotal));
+        applianceRequest.setConsumptionCurrentMonth(StringUtils.convertJunToNumber(consumptionCurrentMonth));
+        applianceRequest.setCostTotal(StringUtils.convertNumberToCost(costTotal));
+        applianceRequest.setCostCurrentMonth(StringUtils.convertNumberToCost(costCurrentMonth));
+        return ResponseEntity.ok().body(applianceRequest);
     }
-
     @PutMapping("/change_status")
-    public ResponseEntity<?> changeStatusAppliance(@RequestBody ApplianceRequest applianceRequest, @RequestParam("id") Long id) {
-        if (!applianceRepository.existsApplianceById(id))
+    public ResponseEntity<?> changeStatusAppliance(@RequestBody ApplianceRequest applianceRequest) {
+
+        if (!applianceRepository.existsApplianceById(applianceRequest.getApplianceId()))
             throw new ResourceNotFoundException("Không tìm thấy thiết bị!");
         try {
-            final String uri = "http://localhost:8080/api/appliance?id=" + id;
+            final String uri = "http://localhost:8080/api/appliance/change_status";
             RestTemplate restTemplate = new RestTemplate();
             ResponseEntity<?> responseEntity = restTemplate.postForEntity(uri, applianceRequest, Object.class);
             if(responseEntity.getStatusCode() == HttpStatus.OK) {
                 log.info("Call api change status to server hub");
-                return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật trạng thái thiết bị thành công!", responseEntity.getBody()));
+                int notificationType = applianceRequest.getStatus() ? 1 : 2;
+                notificationService.createNotification(applianceRequest.getApplianceId(), applianceRequest.getUserId(), notificationType);
+                return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật trạng thái thiết bị thành công!"));
             }
             return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
         } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Không thể kết nối tới hub!");
+        }
+    }
+    @GetMapping("/{applianceId}/standby")
+    public void receiveNotificationStandby(@RequestParam("off") Boolean off, @PathVariable("applianceId") Long applianceId){
+        int notificationType = !off ? 5 : 6;
+        notificationService.createNotification(applianceId, null, notificationType);
+    }
+    @PutMapping("/change_auto_off")
+    public ResponseEntity<?> changeAutoOffAppliance(@RequestBody ApplianceRequest applianceRequest) {
+        if (!applianceRepository.existsApplianceById(applianceRequest.getApplianceId())) throw new ResourceNotFoundException("Không tìm thấy thiết bị!");
+        try {
+            final String uri = "http://localhost:8080/api/appliance/change_auto_off";
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<?> responseEntity = restTemplate.postForEntity(uri, applianceRequest, Object.class);
+            if(responseEntity.getStatusCode() == HttpStatus.OK) {
+                log.info("Call api change auto_off to server hub");
+                return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật auto off thiết bị thành công!"));
+            }
+            return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.internalServerError().body("Không thể kết nối tới hub!");
         }
     }
@@ -84,6 +129,8 @@ public class ApplianceController {
     @Data
     @ToString
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class ApplianceRequest {
         private Long userId;
@@ -92,6 +139,11 @@ public class ApplianceController {
         private Long roomId;
         private String roomName;
         private Boolean status;
+        private Boolean autoOff;
+        private Appliance appliance;
+        private String consumptionCurrentMonth;
+        private String consumptionTotal;
+        private String costCurrentMonth;
+        private String costTotal;
     }
-
 }

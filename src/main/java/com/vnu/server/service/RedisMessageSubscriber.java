@@ -7,6 +7,7 @@ import com.vnu.server.model.Detail;
 import com.vnu.server.model.MessageConsumption;
 import com.vnu.server.socket.MessageSocket;
 import com.vnu.server.socket.Socket;
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
@@ -72,11 +73,12 @@ public class RedisMessageSubscriber implements MessageListener {
                                 .data(new DataConsumption(messageConsumption.getTime(), finalSum))
                                 .build());
                     }
-
                 });
                 SendDataThread.count = 0;
                 data = new HashMap<>();
             }
+
+
             Socket.sockets.forEach(element -> {
                 if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_ROOMS")) {
                     element.sendMessage(MessageSocket.builder()
@@ -90,13 +92,23 @@ public class RedisMessageSubscriber implements MessageListener {
                             .build());
                 }
                 if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_ROOM")) {
-                    HashMap<Long, Integer> wattInRoom = new HashMap<>();
-                    for(Long key: keys) {
+                    HashMap<Long, Wattage> wattInRoom = new HashMap<>();
+                    for (Long key : keys) {
                         Detail detail = messageConsumption.getData().get(key);
-                        if(Objects.equals(detail.getRoomId(), element.getRoomId())) wattInRoom.put(key, detail.getValue());
+                        if (Objects.equals(detail.getRoomId(), element.getRoomId()))
+                            wattInRoom.put(key, Wattage.builder()
+                                    .value(detail.getValue())
+                                    .standBy(detail.getStandBy())
+                                    .build());
                     }
                     element.sendMessage(MessageSocket.builder().typeMessage("SPEED_METTER_ROOM")
                             .data(wattInRoom)
+                            .build());
+                }
+                if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_APPLIANCE")) {
+                    Detail detail = messageConsumption.getData().get(element.getApplianceId());
+                    element.sendMessage(MessageSocket.builder().typeMessage("SPEED_METER")
+                            .data(detail)
                             .build());
                 }
             });
@@ -112,7 +124,9 @@ public class RedisMessageSubscriber implements MessageListener {
         return is.readObject();
     }
 
-    private static class RoomConsumption {
-
+    @Builder
+    private static class Wattage {
+        private Integer value;
+        private Boolean standBy;
     }
 }

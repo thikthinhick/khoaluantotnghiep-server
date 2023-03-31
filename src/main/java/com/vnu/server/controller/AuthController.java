@@ -169,12 +169,13 @@ public class AuthController {
                 myUserDetails.getUser().getUsername(),
                 myUserDetails.getUser().getFullName(),
                 myUserDetails.getUser().getId(),
+                myUserDetails.getUser().getThumbnail(),
                 roles));
     }
 
     @GetMapping("/get_user")
     public ResponseEntity<?> getUser(@RequestParam("room_id") Long roomId) {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findUsersNotAdmin();
         List<Long> ids = roomRepository.getById(roomId)
                 .getMembers().stream()
                 .map(element -> element.getUser().getId()).collect(Collectors.toList());

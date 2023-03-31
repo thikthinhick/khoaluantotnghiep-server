@@ -8,4 +8,5 @@ import lombok.Data;
 public class Detail {
     private Integer value;
     private Long roomId;
+    private Boolean standBy;
 }

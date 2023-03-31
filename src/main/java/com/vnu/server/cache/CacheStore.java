@@ -27,7 +27,6 @@ public class CacheStore<T> {
                     + " Cache with Key = " + key);
         }
     }
-
     public void clear(String key) {
         if (key != null) {
             cache.invalidate(key);

@@ -25,5 +25,8 @@ public class RequestData {
     private Long userId;
 
     private DbSchedule schedule;
+    private Boolean scheduleStatus;
     private Long scheduleId;
+    private Boolean typeSchedule;
+    private Integer estimatedTime;
 }

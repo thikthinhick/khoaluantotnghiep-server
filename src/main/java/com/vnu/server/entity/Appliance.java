@@ -1,7 +1,6 @@
 package com.vnu.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import lombok.Builder;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -18,6 +17,8 @@ public class Appliance {
     private String description;
     private Boolean category;
     private Boolean status;
+    @Column(columnDefinition = "boolean default false")
+    private Boolean autoOff;
     @OneToMany(mappedBy = "appliance")
     private Set<Consumption> consumptions = new HashSet<>();
     @OneToMany(mappedBy = "appliance")
@@ -97,5 +98,13 @@ public class Appliance {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public Boolean getAutoOff() {
+        return autoOff;
+    }
+
+    public void setAutoOff(Boolean autoOff) {
+        this.autoOff = autoOff;
     }
 }

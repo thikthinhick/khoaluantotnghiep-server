@@ -46,7 +46,6 @@ public class JwtTokenProvider {
                 .setSigningKey(JWT_SECRET)
                 .parseClaimsJws(token)
                 .getBody();
-
         return claims.get("userId").toString();
     }
 
