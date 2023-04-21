@@ -10,6 +10,7 @@ import java.sql.Time;
 @Entity
 @ToString
 @JsonIgnoreProperties("appliance")
+@Table(name = "appliance_schedule")
 public class DbSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

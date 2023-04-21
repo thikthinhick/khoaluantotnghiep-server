@@ -30,7 +30,7 @@ public class StringUtils {
     public static String lastOneMonth(Date date) {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
-        cal.add(Calendar.MONTH, 1);
+        cal.add(Calendar.MONTH, -1);
         return convertDateToString(cal.getTime(), "yyyy-MM");
     }
     public static String convertJunToNumber(Long value) {

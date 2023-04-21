@@ -2,6 +2,7 @@ package com.vnu.server.controller;
 
 import com.vnu.server.entity.Staff;
 import com.vnu.server.repository.StaffRepository;
+import com.vnu.server.service.StaffService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.Map;
 @CrossOrigin
 public class StaffController {
     private final StaffRepository staffRepository;
+    private final StaffService staffService;
     @GetMapping
     public ResponseEntity<?> getAll() {
         List<Staff> staffList = staffRepository.findAll();
@@ -25,12 +27,15 @@ public class StaffController {
         staffList.forEach(element -> {
             data.put(element.getName(), element);
         });
-
         return ResponseEntity.ok().body(data);
     }
     @PutMapping
-    public void updateAll(@RequestBody Map<String, Staff> map) {
+    public void updateValueStaffAll(@RequestBody Map<String, Staff> map) {
        List<Staff> staffList = new ArrayList<Staff>(map.values());
        staffRepository.saveAll(staffList);
+    }
+    @PutMapping("/{id}")
+    public void changeStaffHome(@PathVariable("id") Long id) {
+       staffService.updateStaffHome(id);
     }
 }

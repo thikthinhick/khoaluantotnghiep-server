@@ -70,15 +70,13 @@ public class RedisMessageSubscriber implements MessageListener {
                     if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_HOME")) {
                         element.sendMessage(MessageSocket.builder()
                                 .typeMessage("CHART_HOME")
-                                .data(new DataConsumption(messageConsumption.getTime(), finalSum))
+                                .data(new DataConsumption(messageConsumption.getTime(), finalSum / 15))
                                 .build());
                     }
                 });
                 SendDataThread.count = 0;
                 data = new HashMap<>();
             }
-
-
             Socket.sockets.forEach(element -> {
                 if (element.getStatus() != null && element.getStatus().equals("SUBSCRIBE_ROOMS")) {
                     element.sendMessage(MessageSocket.builder()

@@ -7,6 +7,7 @@ import com.vnu.server.exception.ResourceNotFoundException;
 import com.vnu.server.model.MessageResponse;
 import com.vnu.server.model.RequestData;
 import com.vnu.server.repository.ApplianceRepository;
+import com.vnu.server.repository.RoomRepository;
 import com.vnu.server.service.appliance.ApplianceService;
 import com.vnu.server.service.notification.NotificationService;
 import com.vnu.server.service.statistic.StatisticService;
@@ -19,12 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @RestController
@@ -35,6 +32,7 @@ import java.util.stream.Collectors;
 public class ApplianceController {
     private final ApplianceService applianceService;
     private final ApplianceRepository applianceRepository;
+    private final RoomRepository roomRepository;
     private final StatisticService statisticService;
     private final NotificationService notificationService;
 
@@ -42,7 +40,20 @@ public class ApplianceController {
     public ResponseEntity<?> createAppliance(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);
-        return ResponseEntity.ok().body(new MessageResponse<>("Tạo thiết bị thành công!", applianceService.save(multipartFile, requestData)));
+        Appliance appliance = applianceService.save(multipartFile, requestData);
+        try {
+            final String uri = "http://localhost:8080/api/appliance/add_appliance?id=" + appliance.getId();
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<?> responseEntity = restTemplate.getForEntity(uri, Object.class);
+            if (responseEntity.getStatusCode() == HttpStatus.OK) {
+                log.info("Call api change status to server hub");
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            log.error("Chưa thêm được thiết bị vào hub vui lòng reset lại hub!");
+        }
+        return ResponseEntity.ok().body(new MessageResponse<>("Tạo thiết bị thành công!", appliance));
     }
 
     @DeleteMapping
@@ -83,6 +94,25 @@ public class ApplianceController {
                 int notificationType = applianceRequest.getStatus() ? 1 : 2;
                 notificationService.createNotification(applianceRequest.getApplianceId(), applianceRequest.getUserId(), notificationType);
                 return ResponseEntity.ok().body(new MessageResponse<>("Cập nhật trạng thái thiết bị thành công!"));
+            }
+            return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("Không thể kết nối tới hub!");
+        }
+    }
+    @PutMapping("/change_status_all")
+    public ResponseEntity<?> changeStatusAllAppliance(@RequestBody ApplianceRequest applianceRequest) {
+        if (!roomRepository.existsRoomById(applianceRequest.getRoomId()))
+            throw new ResourceNotFoundException("Không tìm thấy phòng!");
+        try {
+            final String uri = "http://localhost:8080/api/appliance/change_status_all";
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<?> responseEntity = restTemplate.postForEntity(uri, applianceRequest, Object.class);
+            if(responseEntity.getStatusCode() == HttpStatus.OK) {
+                log.info("Call api change status to server hub");
+//                notificationService.createNotification(applianceRequest.getApplianceId(), applianceRequest.getUserId(), 7);
+                return ResponseEntity.ok().body(new MessageResponse<>("Tắt tất cả các thiết bị trong phòng thành công!"));
             }
             return ResponseEntity.status(responseEntity.getStatusCode()).body(responseEntity.getBody());
         } catch (Exception e) {

@@ -48,7 +48,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         dbSchedule.setRepeatDay(schedule.getRepeatDay());
         scheduleRepository.save(dbSchedule);
     }
-
+    // Thiếu ngày chủ nhật
     public int optimize(String minTime, String maxTime, int estimatedTime) {
         int[] arr = initialArray();
         int[] price = {1100, 1685, 3076};

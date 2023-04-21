@@ -74,17 +74,27 @@ public class StatisticServiceImpl implements StatisticService{
 
     @Override
     public Long getTotalConsumptionByRoom(String date, Long roomId) {
-        String now =  StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
         return consumptionDayRepository.getTotalConsumptionByRoom(date + "%", roomId);
     }
 
     @Override
     public Double getPrice(String day, Long applianceId) {
+        String now = StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
+        String month = now.substring(0, 7);
+        if(now.equals(day) || day.equals("")) return consumptionRepository.getPrice(day + "%", applianceId);
+        else if(month.equals(day)) return consumptionRepository.getPrice(now + "%", applianceId) + consumptionDayRepository.getPrice(day + "%", applianceId);
         return consumptionDayRepository.getPrice(day + "%", applianceId);
     }
 
     @Override
     public Double getPrice(String day) {
+        String now = StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
+        String month = now.substring(0, 7);
+
+        if(now.equals(day)) return consumptionRepository.getPrice(day + "%");
+        else if(month.equals(day) || day.equals(""))
+            return consumptionRepository.getPrice(now + "%") + consumptionDayRepository.getPrice(day + "%");
+
         return consumptionDayRepository.getPrice(day + "%");
     }
 }

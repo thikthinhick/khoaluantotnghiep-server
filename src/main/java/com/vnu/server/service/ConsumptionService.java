@@ -3,6 +3,7 @@ package com.vnu.server.service;
 import com.vnu.server.entity.Appliance;
 import com.vnu.server.entity.Consumption;
 import com.vnu.server.exception.ResourceNotFoundException;
+import com.vnu.server.model.CSModel;
 import com.vnu.server.model.DataConsumption;
 import com.vnu.server.repository.ApplianceRepository;
 import com.vnu.server.repository.ConsumptionRepository;
@@ -32,19 +33,37 @@ public class ConsumptionService {
             e.printStackTrace();
         }
     }
-    public List<DataConsumption> getLastConsumption(int distance) {
-        List<Consumption> consumptions = consumptionRepository.getLatestConsumption(distance);
+    public List<DataConsumption> getLastConsumption(String type) {
+        if(Objects.equals(type, "0")) {
+            List<CSModel> consumptions = consumptionRepository.getLatestConsumptionSecond();
+            Date now = new Date();
+            int second = Integer.parseInt(convertDateToString(now, "ss"));
+            second %= 15;
+            now = increaseDate(now, -second);
+            HashMap<String, Integer> map = new HashMap<>();
+            consumptions.forEach(element -> {
+                map.put(element.getTime(), element.getValue());
+            });
+            List<DataConsumption> data = new ArrayList<>();
+            for(int i = 80; i >= 0; i--) {
+                String date = convertDateToString(increaseDate(now, - i * 15), "yyyy-MM-dd HH:mm:ss");
+                if(map.get(date) != null) data.add(new DataConsumption(date, map.get(date)));
+                else data.add(new DataConsumption(date, 0));
+            }
+            return data;
+        }
+        List<CSModel> consumptions = consumptionRepository.getLatestConsumptionMinute();
         Date now = new Date();
-        int second = Integer.parseInt(convertDateToString(now, "ss"));
-        second %= 15;
-        now = increaseDate(now, -second);
+        int minute = Integer.parseInt(convertDateToString(now, "mm"));
+        minute %= 20;
+        now = increaseDate(now,  - minute * 60);
         HashMap<String, Integer> map = new HashMap<>();
         consumptions.forEach(element -> {
-            map.put(element.getTime(), element.getCurrentValue());
+            map.put(element.getTime(), element.getValue());
         });
         List<DataConsumption> data = new ArrayList<>();
         for(int i = 80; i >= 0; i--) {
-            String date = convertDateToString(increaseDate(now, - i * 15), "yyyy-MM-dd HH:mm:ss");
+            String date = convertDateToString(increaseDate(now, - i * 1200), "yyyy-MM-dd HH:mm") + ":00";
             if(map.get(date) != null) data.add(new DataConsumption(date, map.get(date)));
             else data.add(new DataConsumption(date, 0));
         }

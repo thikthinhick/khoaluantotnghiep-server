@@ -25,7 +25,7 @@ public class Appliance {
     private Set<DbSchedule> dbSchedules = new HashSet<>();
     @ManyToOne
     @JoinColumn(name = "room_id")
-    @JsonIgnoreProperties({"appliances", "members"})
+     @JsonIgnoreProperties({"appliances", "members"})
     private Room room;
 
     public String getDescription() {

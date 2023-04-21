@@ -16,7 +16,9 @@ public class DataResponse {
     private String consumptionInMonth;
     private String consumptionInYear;
     private String consumptionTotal;
+    private String staffType;
     private String costLastMonth;
+    private String costCurrentDay;
     private String costCurrentMonth;
     private String costTotal;
 }

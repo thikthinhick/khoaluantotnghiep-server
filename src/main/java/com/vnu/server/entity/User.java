@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -36,6 +37,8 @@ public class User {
 
     @Transient
     private String token;
+    @Transient
+    private List<String> listRoomNames;
 
     public String getEmail() {
         return email;
@@ -111,5 +114,13 @@ public class User {
 
     public void setMembers(Set<Member> members) {
         this.members = members;
+    }
+
+    public List<String> getListRoomNames() {
+        return listRoomNames;
+    }
+
+    public void setListRoomNames(List<String> listRoomNames) {
+        this.listRoomNames = listRoomNames;
     }
 }
