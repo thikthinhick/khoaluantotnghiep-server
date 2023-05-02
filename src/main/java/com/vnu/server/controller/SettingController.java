@@ -1,6 +1,7 @@
 package com.vnu.server.controller;
 
 import com.vnu.server.entity.User;
+import com.vnu.server.repository.BillRepository;
 import com.vnu.server.repository.StaffRepository;
 import com.vnu.server.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -21,10 +22,10 @@ import java.util.stream.Collectors;
 @CrossOrigin
 public class SettingController {
     private final UserRepository userRepository;
-    private final StaffRepository staffRepository;
+    private final BillRepository billRepository;
     @GetMapping
     public ResponseEntity<?> getSeSetting() {
-        String result = staffRepository.spGetStaff();
+        String result = billRepository.spBillCurrent();
         List<User> users = userRepository.findUsersNotAdmin();
         users.forEach(element -> {
             element.setListRoomNames(element.getMembers().stream().map(item -> item.getRoom().getName()).collect(Collectors.toList()));

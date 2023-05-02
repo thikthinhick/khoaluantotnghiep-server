@@ -1,6 +1,6 @@
 package com.vnu.server.jwt;
 
-import com.vnu.server.service.user.UserServiceImpl;
+import com.vnu.server.service.statistic.user.UserServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

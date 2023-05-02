@@ -1,7 +1,6 @@
-package com.vnu.server.service.user;
+package com.vnu.server.service.statistic.user;
 
 import com.vnu.server.entity.Member;
-import com.vnu.server.entity.Role;
 import com.vnu.server.entity.Room;
 import com.vnu.server.entity.User;
 import com.vnu.server.exception.ResourceNotFoundException;
@@ -13,7 +12,6 @@ import com.vnu.server.repository.RoomRepository;
 import com.vnu.server.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,8 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.vnu.server.entity.Role.RoleName.READ;
 
 @Service
 @RequiredArgsConstructor

@@ -12,14 +12,13 @@ import com.vnu.server.service.FileFirebaseService;
 import com.vnu.server.service.appliance.ApplianceService;
 import com.vnu.server.service.room.RoomService;
 import com.vnu.server.service.statistic.StatisticService;
-import com.vnu.server.service.user.UserService;
+import com.vnu.server.service.statistic.user.UserService;
 import com.vnu.server.utils.StringUtils;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,7 +43,6 @@ public class RoomController {
     private final StatisticService statisticService;
 
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> createRoom(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
         Gson gson = new Gson();
         RequestData requestData = gson.fromJson(data, RequestData.class);
@@ -98,9 +96,6 @@ public class RoomController {
             });
             return ResponseEntity.ok().body(new MessageResponse<List<RoomResponse>>("Lấy dữ liệu thành công!", roomResponses));
         }
-//        String jwt = FunctionPopular.getJwtFromRequest(request);
-//        String userId = jwtTokenProvider.getUserIdFromJWT(jwt);
-//        return ResponseEntity.ok().body(roomService.getById(id, Long.parseLong(userId)));
         Room room = roomService.getById(id);
         Date date = new Date();
         String month = StringUtils.convertDateToString(date, "yyyy-MM");

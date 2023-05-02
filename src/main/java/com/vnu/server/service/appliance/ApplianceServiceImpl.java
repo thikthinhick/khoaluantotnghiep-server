@@ -64,6 +64,7 @@ public class ApplianceServiceImpl implements ApplianceService{
         appliance.setDescription(requestData.getApplianceDescription());
         appliance.setName(requestData.getApplianceName());
         appliance.setRoom(room);
+        appliance.setStatus(false);
         appliance.setCategory(requestData.getApplianceType());
         if(multipartFile != null) {
             appliance.setThumbnail(fileFirebaseService.upload(multipartFile));

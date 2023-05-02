@@ -28,8 +28,9 @@ public class HomeController {
         String day = StringUtils.convertDateToString(date, "yyyy-MM-dd");
         String month = StringUtils.convertDateToString(date, "yyyy-MM");
         Long consumptionInDay = statisticService.getTotalConsumptionDay(day);
-        Long consumptionInMonth = statisticService.getTotalConsumptionMonth(StringUtils.convertDateToString(date, "yyyy-MM"));
-        Long consumptionTotal = statisticService.getTotalConsumption();
+        Long consumptionInMonth = statisticService.getTotalConsumptionDay(day.substring(0, 7));
+        Long consumptionInYear = statisticService.getTotalConsumptionDay(day.substring(0, 4));
+        Long consumptionTotal = statisticService.getTotalConsumptionDay("");
         int costLastMonth = (int) Math.round(statisticService.getPrice(StringUtils.lastOneMonth(date)));
         int costCurrentMonth = (int)Math.round(statisticService.getPrice(month));
         int costTotal = (int) Math.round(statisticService.getPrice(""));
@@ -39,7 +40,7 @@ public class HomeController {
         DataResponse dataResponse = DataResponse.builder()
                 .consumptionInDay(StringUtils.convertJunToNumber(consumptionInDay))
                 .consumptionInMonth(StringUtils.convertJunToNumber(consumptionInMonth))
-                .consumptionInYear(StringUtils.convertJunToNumber(consumptionInMonth))
+                .consumptionInYear(StringUtils.convertJunToNumber(consumptionInYear))
                 .consumptionTotal(StringUtils.convertJunToNumber(consumptionTotal))
                 .costLastMonth(StringUtils.convertNumberToCost(costLastMonth))
                 .costCurrentDay(StringUtils.convertNumberToCost(costCurrentDay))
