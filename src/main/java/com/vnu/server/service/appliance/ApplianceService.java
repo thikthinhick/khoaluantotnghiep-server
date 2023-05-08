@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ApplianceService {
     void save(Appliance appliance, Long userId, Long roomId);
-    void update(Appliance appliance);
+    void update(MultipartFile multipartFile, RequestData requestData);
     void delete(Long applianceId);
     Appliance save(MultipartFile multipartFile, RequestData requestData);
     List<Appliance> getAll();

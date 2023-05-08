@@ -52,6 +52,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     private String thumbnail;
+    private Boolean active;
     @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
@@ -122,5 +123,13 @@ public class User {
 
     public void setListRoomNames(List<String> listRoomNames) {
         this.listRoomNames = listRoomNames;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

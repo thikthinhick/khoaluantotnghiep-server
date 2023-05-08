@@ -1,7 +1,7 @@
 package com.vnu.server.config;
 
 import com.vnu.server.jwt.JwtAuthenticationFilter;
-import com.vnu.server.service.statistic.user.UserServiceImpl;
+import com.vnu.server.service.user.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,9 +51,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter{
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/**", "/websocket").permitAll()
-//                .antMatchers(HttpMethod.GET, "/api/test").hasAuthority("USER")
+                .antMatchers( "/api/auth/**","/api/appliance/*/standby", "/websocket", "/api/notification/receive").permitAll()
                 .anyRequest().authenticated();
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.cors();
     }
 }

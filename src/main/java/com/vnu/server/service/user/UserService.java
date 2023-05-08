@@ -1,4 +1,4 @@
-package com.vnu.server.service.statistic.user;
+package com.vnu.server.service.user;
 
 import com.vnu.server.entity.User;
 

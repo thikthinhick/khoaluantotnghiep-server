@@ -91,7 +91,6 @@ public class StatisticServiceImpl implements StatisticService {
         }
 
         consumptionRepository.getConsumptionMostRecentDays(map.keySet()).forEach(element -> map.put(element.getTime(), element.getValue() / 3600));
-        System.out.println(map);
         return map.keySet().stream().sorted().map(map::get).collect(Collectors.toList());
     }
 

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.security.PermitAll;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +55,13 @@ public class ApplianceController {
             log.error("Chưa thêm được thiết bị vào hub vui lòng reset lại hub!");
         }
         return ResponseEntity.ok().body(new MessageResponse<>("Tạo thiết bị thành công!", appliance));
+    }
+    @PutMapping
+    public ResponseEntity<?> updateAppliance(@RequestParam(required = false, name = "file") MultipartFile multipartFile, @RequestParam("data") String data) {
+        Gson gson = new Gson();
+        RequestData requestData = gson.fromJson(data, RequestData.class);
+        applianceService.update(multipartFile, requestData);
+        return ResponseEntity.ok().body(new MessageResponse<>("Chỉnh sửa thiết bị thành công!"));
     }
 
     @DeleteMapping
@@ -120,10 +128,10 @@ public class ApplianceController {
             return ResponseEntity.internalServerError().body("Không thể kết nối tới hub!");
         }
     }
+    @PermitAll
     @GetMapping("/{applianceId}/standby")
-    public void receiveNotificationStandby(@RequestParam("off") Boolean off, @PathVariable("applianceId") Long applianceId){
-        int notificationType = !off ? 5 : 6;
-        notificationService.createNotification(applianceId, null, notificationType);
+    public void receiveNotificationStandby(@PathVariable("applianceId") Long applianceId){
+        notificationService.createNotification(applianceId, null, 6);
     }
     @PutMapping("/change_auto_off")
     public ResponseEntity<?> changeAutoOffAppliance(@RequestBody ApplianceRequest applianceRequest) {

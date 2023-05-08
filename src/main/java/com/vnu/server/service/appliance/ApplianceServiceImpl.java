@@ -43,8 +43,13 @@ public class ApplianceServiceImpl implements ApplianceService{
     }
 
     @Override
-    public void update(Appliance appliance) {
-        if(applianceRepository.existsApplianceById(appliance.getId())) throw new ResourceNotFoundException("khong tim thay thiet bi!");
+    public void update(MultipartFile multipartFile, RequestData requestData) {
+        Appliance appliance = applianceRepository.findById(requestData.getApplianceId()).orElseThrow(() -> new ResourceNotFoundException("khong tim thay thiet bi!"));
+        appliance.setName(requestData.getApplianceName());
+        appliance.setDescription(requestData.getApplianceDescription());
+        if(multipartFile != null) {
+            appliance.setThumbnail(fileFirebaseService.upload(multipartFile));
+        }
         applianceRepository.save(appliance);
     }
 

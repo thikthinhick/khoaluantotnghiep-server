@@ -1,4 +1,4 @@
-package com.vnu.server.service.statistic.user;
+package com.vnu.server.service.user;
 
 import com.vnu.server.entity.Member;
 import com.vnu.server.entity.Room;
@@ -28,8 +28,6 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final MemberRepository memberRepository;
-    private final RoleRepository roleRepository;
-    private final JwtTokenProvider tokenProvider;
 
     @Override
     public UserDetails loadUserByUsername(String username) {
@@ -44,11 +42,9 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     public void addUserToRoom(Long userId, Long roomId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException("Not found user!"));
         Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Not found room!"));
-//        Role role = roleRepository.findByName(READ.name()).orElseThrow(() -> new ResourceNotFoundException("Not found role!"));
         Member member = new Member();
         member.setUser(user);
         member.setRoom(room);
-//        member.setRole(role);
         try{
             memberRepository.save(member);
         }
@@ -60,7 +56,7 @@ public class UserServiceImpl implements UserDetailsService, UserService {
     @Override
     @Transactional
     public void addListUserToRoom(List<Long> ids, Long roomId) {
-        memberRepository.deleteByUserId(roomId);
+        memberRepository.deleteByRoomId(roomId);
         ids.forEach(userId -> {
            this.addUserToRoom(userId, roomId);
         });

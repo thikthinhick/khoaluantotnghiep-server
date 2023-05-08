@@ -12,7 +12,7 @@ import com.vnu.server.service.FileFirebaseService;
 import com.vnu.server.service.appliance.ApplianceService;
 import com.vnu.server.service.room.RoomService;
 import com.vnu.server.service.statistic.StatisticService;
-import com.vnu.server.service.statistic.user.UserService;
+import com.vnu.server.service.user.UserService;
 import com.vnu.server.utils.StringUtils;
 import lombok.Builder;
 import lombok.Data;
@@ -65,6 +65,8 @@ public class RoomController {
                 .build()));
     }
 
+
+
     @DeleteMapping("/{roomId}")
 //    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteRoom(@PathVariable("roomId") Long roomId) {
@@ -73,10 +75,11 @@ public class RoomController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getRoom(@RequestParam(required = false, name = "id") Long id, HttpServletRequest request) {
+    public ResponseEntity<?> getRoom( @RequestParam(required = false, name = "id") Long id, HttpServletRequest request) {
         if (id == null) {
             List<Room> rooms = roomService.getAll();
             List<RoomResponse> roomResponses = new ArrayList<>();
+            Long userId = Long.parseLong(jwtTokenProvider.getUserIdFromJWT(request.getHeader("Authorization").split(" ")[1]));
             rooms.forEach(element -> {
                 roomResponses.add(
                         RoomResponse.builder()
@@ -91,6 +94,9 @@ public class RoomController {
                                         .id(item.getUser().getId())
                                         .username(item.getUser().getUsername())
                                         .build()).collect(Collectors.toList()))
+                                .active(element.getMembers().stream().map(item -> item.getUser()
+                                        .getId()).collect(Collectors.toList())
+                                        .contains(userId))
                                 .build()
                 );
             });
@@ -100,6 +106,7 @@ public class RoomController {
         Date date = new Date();
         String month = StringUtils.convertDateToString(date, "yyyy-MM");
         Long totalConsumptionMonth = statisticService.getTotalConsumptionByRoom(month, id);
+
         RoomResponse roomResponse = RoomResponse.builder()
                 .roomName(room.getName())
                 .roomId(room.getId())
@@ -112,13 +119,12 @@ public class RoomController {
                         .id(element.getUser().getId())
                         .username(element.getUser().getUsername())
                         .build()).collect(Collectors.toList()))
+
                 .currentWattage(100)
                 .build();
         return ResponseEntity.ok().body(roomResponse);
     }
 
-
-    //    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/{roomId}/user/{userId}")
     public ResponseEntity<?> addUserToRoom(@PathVariable("roomId") Long roomId, @PathVariable("userId") Long userId) {
         userService.addUserToRoom(userId, roomId);
@@ -136,12 +142,14 @@ public class RoomController {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private static class RoomResponse {
         private Long roomId;
+        private Long id;
         private String thumbnail;
         private String roomName;
         private Integer totalAppliances;
         private String descriptionRoom;
         private Integer currentWattage;
         private String totalConsumptionMonth;
+        private Boolean active;
         private List<User> users;
         private Set<Appliance> appliances;
     }

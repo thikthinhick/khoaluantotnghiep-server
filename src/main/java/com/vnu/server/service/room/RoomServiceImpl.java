@@ -11,6 +11,7 @@ import com.vnu.server.repository.UserRepository;
 import com.vnu.server.service.FileFirebaseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -50,6 +51,11 @@ public class RoomServiceImpl implements RoomService {
     public Room save(MultipartFile multipartFile, RequestData data) {
         Room room = new Room();
         saveRoom(multipartFile, data, room);
+        User user = userRepository.findById(3L).orElseThrow(() -> new ResourceNotFoundException("Not found user!"));
+        Member member = new Member();
+        member.setRoom(room);
+        member.setUser(user);
+        memberRepository.save(member);
         return room;
     }
 
@@ -73,8 +79,10 @@ public class RoomServiceImpl implements RoomService {
     }
 
     @Override
+    @Transactional
     public void delete(Long roomId) {
-        roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong!"));
+        Room room = roomRepository.findById(roomId).orElseThrow(() -> new ResourceNotFoundException("Khong tim thay phong!"));
+        memberRepository.deleteAll(room.getMembers());
         roomRepository.deleteById(roomId);
     }
 

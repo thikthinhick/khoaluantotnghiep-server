@@ -43,20 +43,26 @@ public class ScheduleTaskFixedRate {
         String time = StringUtils.convertDateToString(now, "HH:mm");
         String nameDay = StringUtils.convertDateToString(now, "EEEE");
         String nameTomorrowDay = StringUtils.convertDateToString(StringUtils.increaseDay(now, 1), "EEEE");
-        List<DbSchedule> schedules = scheduleRepository.findDbScheduleByStatus(true);
-        schedules.forEach(element -> {
-            if(element.getStartDate().equals(time) && !element.getAppliance().getStatus() && checkDay(element.getRepeatDay(), nameDay)) {
-                changeStatusAppliance(element.getAppliance().getId(), true, 3);
-            }
-            String day = element.getEndDate().compareTo(element.getStartDate()) >= 0 ? nameDay : nameTomorrowDay;
-            if(element.getEndDate().equals(time) && element.getAppliance().getStatus() && checkDay(element.getRepeatDay(), day)){
-                changeStatusAppliance(element.getAppliance().getId(), false, 4);
-                if(element.getRepeatDay().equals("")) {
-                    element.setStatus(false);
-                    scheduleRepository.save(element);
+        try {
+            List<DbSchedule> schedules = scheduleRepository.findDbScheduleByStatus(true);
+            schedules.forEach(element -> {
+                if(element.getStartDate().equals(time) && !element.getAppliance().getStatus() && checkDay(element.getRepeatDay(), nameDay)) {
+                    changeStatusAppliance(element.getAppliance().getId(), true, 3);
                 }
-            }
-        });
+                String day = element.getEndDate().compareTo(element.getStartDate()) >= 0 ? nameDay : nameTomorrowDay;
+                if(element.getEndDate().equals(time) && element.getAppliance().getStatus() && checkDay(element.getRepeatDay(), day)){
+                    changeStatusAppliance(element.getAppliance().getId(), false, 4);
+                    if(element.getRepeatDay().equals("")) {
+                        element.setStatus(false);
+                        scheduleRepository.save(element);
+                    }
+                }
+            });
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     private boolean checkDay(String repeatDay, String nameDay) {

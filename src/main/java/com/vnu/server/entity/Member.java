@@ -12,9 +12,6 @@ import javax.persistence.*;
 public class Member {
     @EmbeddedId
     private MemberId memberId = new MemberId();
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "role_id", referencedColumnName = "id")
-    private Role role;
     @ManyToOne
     @MapsId("userId")
     @JoinColumn(name = "user_id")
@@ -28,7 +25,6 @@ public class Member {
     public Member() {
 
     }
-
     public MemberId getMemberId() {
         return memberId;
     }
@@ -37,13 +33,7 @@ public class Member {
         this.memberId = memberId;
     }
 
-    public Role getRole() {
-        return role;
-    }
 
-    public void setRole(Role role) {
-        this.role = role;
-    }
 
     public User getUser() {
         return user;

@@ -17,5 +17,8 @@ public interface MemberRepository extends JpaRepository<Member, MemberId> {
     List<Member> findMemberByUserIdAndRoomId(Long userId, Long roomId);
     @Modifying
     @Query(value = "delete from member m where room_id = ?1", nativeQuery = true)
-    void deleteByUserId(Long roomId);
+    void deleteByRoomId(Long roomId);
+    @Modifying
+    @Query(value = "delete from member m where user_id = ?1", nativeQuery = true)
+    void deleteByUserId(Long userId);
 }

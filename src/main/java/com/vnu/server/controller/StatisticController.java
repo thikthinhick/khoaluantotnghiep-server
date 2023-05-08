@@ -1,8 +1,8 @@
 package com.vnu.server.controller;
-
 import com.vnu.server.model.CSModel;
 import com.vnu.server.repository.BillRepository;
 import com.vnu.server.repository.ConsumptionRepository;
+import com.vnu.server.repository.StaffRepository;
 import com.vnu.server.service.statistic.StatisticService;
 import com.vnu.server.utils.StringUtils;
 import lombok.AllArgsConstructor;
@@ -22,9 +22,11 @@ public class StatisticController {
     private final BillRepository billRepository;
     private final ConsumptionRepository consumptionRepository;
     private final StatisticService statisticService;
+    private final StaffRepository staffRepository;
     @GetMapping
     public ResponseEntity<?> getStatistic() {
         String now = StringUtils.convertDateToString(new Date(), "yyyy-MM-dd");
+        List<Integer> staffs = staffRepository.getStaffSingleAndConsumption();
         List<CSModel> csModels = consumptionRepository.getBillAll();
         List<BillStaff> billStaffs = csModels.stream().map(element -> {
             return BillStaff.builder()
@@ -32,7 +34,9 @@ public class StatisticController {
                     .year(element.getTime().split("-")[0])
                     .consumption(StringUtils.convertJunToNumber(element.getTotalValue()))
                     .staffType(element.getStaffId())
-                    .cost(StringUtils.convertNumberToCost((int) Math.round(element.getPriceTotal())))
+                    .costByTime(StringUtils.convertNumberToCost((int) Math.round(element.getPriceTotal())))
+                    .costSingle(StringUtils.convertNumberToCost((int) ((element.getTotalValue() * staffs.get(0)) / 3600000)) )
+                    .costByTotalConsumption(StringUtils.convertNumberToCost(getCostByTotalConsumption(element.getTotalValue(), staffs)))
                     .build();
         }).collect(Collectors.toList());
         StatisticResponse statisticResponse = new StatisticResponse();
@@ -74,6 +78,22 @@ public class StatisticController {
         private String year;
         private Integer staffType;
         private String consumption;
-        private String cost;
+        private String costSingle;
+        private String costByTime;
+        private String costByTotalConsumption;
+    }
+    private Integer getCostByTotalConsumption(Long consumption, List<Integer> staffs) {
+        double x = (double) consumption / 3600000;
+
+        double sum = 0;
+        double[] arr = {0, 50, 100, 200, 300, 400, 100000};
+        int index = 1;
+        while(x > arr[index]) {
+            sum += (arr[index] - arr[index - 1]) * staffs.get(index);
+            index++;
+        }
+        sum += (x - arr[index - 1]) * staffs.get(index);
+
+        return (int) sum;
     }
 }

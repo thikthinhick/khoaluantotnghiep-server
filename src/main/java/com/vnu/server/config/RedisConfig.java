@@ -2,6 +2,7 @@ package com.vnu.server.config;
 
 import com.vnu.server.service.ConsumptionService;
 import com.vnu.server.service.RedisMessageSubscriber;
+import com.vnu.server.service.notification.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,8 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 public class RedisConfig {
     @Autowired
     private ConsumptionService consumptionService;
+    @Autowired
+    private NotificationService notificationService;
 
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
@@ -34,7 +37,7 @@ public class RedisConfig {
 
     @Bean
     MessageListenerAdapter messageListener() {
-        return new MessageListenerAdapter(new RedisMessageSubscriber(consumptionService));
+        return new MessageListenerAdapter(new RedisMessageSubscriber(consumptionService, notificationService));
     }
 
 

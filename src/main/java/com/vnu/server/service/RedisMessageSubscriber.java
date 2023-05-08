@@ -5,10 +5,13 @@ import com.vnu.server.entity.Consumption;
 import com.vnu.server.model.DataConsumption;
 import com.vnu.server.model.Detail;
 import com.vnu.server.model.MessageConsumption;
+import com.vnu.server.service.notification.NotificationService;
 import com.vnu.server.socket.MessageSocket;
 import com.vnu.server.socket.Socket;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
@@ -17,18 +20,19 @@ import javax.annotation.PostConstruct;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
 public class RedisMessageSubscriber implements MessageListener {
     private HashMap<Long, Integer> data = new HashMap<>();
+    private List<Long> sessionStandby = new ArrayList<>();
     private final ConsumptionService consumptionService;
+    private final NotificationService notificationService;
 
-    public RedisMessageSubscriber(ConsumptionService consumptionService) {
+    public RedisMessageSubscriber(ConsumptionService consumptionService, NotificationService notificationService) {
         this.consumptionService = consumptionService;
+        this.notificationService = notificationService;
     }
 
     private SendDataThread thread = new SendDataThread(20);
@@ -110,6 +114,17 @@ public class RedisMessageSubscriber implements MessageListener {
                             .build());
                 }
             });
+            for (Long key : keys) {
+                Boolean standby = messageConsumption.getData().get(key).getStandBy();
+                if(standby && !sessionStandby.contains(key)) {
+                    notificationService.createNotification(key, null, 5);
+                    sessionStandby.add(key);
+                }
+                else if(!standby) {
+                    sessionStandby.remove(key);
+                }
+            }
+            sessionStandby.removeIf(id -> !keys.contains(id));
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
